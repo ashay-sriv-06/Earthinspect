@@ -16,8 +16,36 @@ from .errors import ApiError
 from .geometry import canonical
 from .requirements import REQUIREMENTS
 
-app = FastAPI(title="EarthInspect", version="1.0.0")
+app = FastAPI(title="EarthInspect", version="1.0.0", docs_url=None, redoc_url=None, openapi_url=None)  # no debug/doc endpoints
 COOKIE = "ei_sid"
+
+# Simple in-memory per-client rate limit for public sharing (protects upstream NASA services).
+import time as _time
+from collections import defaultdict, deque
+
+_hits: dict[str, deque] = defaultdict(deque)
+RATE_LIMIT = 240          # requests per window per client
+RATE_WINDOW_S = 60
+HEAVY = ("/analyze", "/copilot", "/api/demo", "/api/geocode", "/api/catalog/cmr", "/api/imagery/latest")
+HEAVY_LIMIT = 30
+
+
+@app.middleware("http")
+async def rate_limit_mw(request: Request, call_next):
+    public_ip = request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for")
+    if request.url.path.startswith("/api/") and public_ip:  # limit only traffic arriving through a public proxy
+        ip = public_ip.split(",")[0].strip()
+        heavy = request.method == "POST" or any(h in request.url.path for h in HEAVY)
+        key = ip + ("|heavy" if heavy else "")
+        now = _time.time()
+        q = _hits[key]
+        while q and now - q[0] > RATE_WINDOW_S:
+            q.popleft()
+        if len(q) >= (HEAVY_LIMIT if heavy else RATE_LIMIT):
+            return JSONResponse({"error": {"code": "rate_limited", "message": "Too many requests; please wait a minute.", "detail": {}}},
+                                status_code=429)
+        q.append(now)
+    return await call_next(request)
 
 
 @app.on_event("startup")
