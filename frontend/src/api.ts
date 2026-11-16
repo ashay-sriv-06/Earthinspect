@@ -38,6 +38,8 @@ export interface Investigation {
       center: [number, number]; zoom: number; layers: Record<string, any>; imagery_date: string | null; inspector_tab: string; selected_variable?: string
       imagery_date_b?: string | null; imagery_mix?: number; selected_node?: string | null; evidence_trail?: string[]
       last_change?: { from: string; to: string } | null
+      imagery_compare?: 'swipe' | 'overlay'; imagery_swipe?: number; camera_saved?: boolean
+      imagery_latest_check?: { latest_date?: string; checked_at?: string; error?: string } | null
     }
     current_batch?: string
   }

@@ -1,4 +1,4 @@
-"""Acceptance: fresh browser session → Open demo investigation → canonical focus consistent across panels → reload."""
+﻿"""Acceptance: fresh browser session → Open demo investigation → canonical focus consistent across panels → reload."""
 import sys
 
 from playwright.sync_api import sync_playwright
@@ -30,6 +30,8 @@ with sync_playwright() as p:
     check(pg.get_by_label("Imagery date B").input_value() == "2018-10-25", "imagery date B = 2018-10-25")
     check(pg.locator(".change-banner").count() == 1, "leads show the assessment change produced by the assumption")
     check("graph g" in fb.inner_text(), "focus bar shows graph version from the match run")
+    pg.get_by_role("button", name="Overlay", exact=True).click()
+    pg.wait_for_timeout(300)
     pg.get_by_role("button", name="Flip to B").click()
     pg.wait_for_timeout(800)
     check("obs B 2018-10-25" in fb.inner_text(), "flipping imagery updates the canonical observation date")

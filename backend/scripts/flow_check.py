@@ -1,4 +1,4 @@
-"""Drive the sprint-2 target flow in the REAL app (headless Chromium) and assert each step.
+﻿"""Drive the sprint-2 target flow in the REAL app (headless Chromium) and assert each step.
 open investigation → compare two real imagery dates → inspect a finding → investigate evidence →
 revise an assumption inline → assessment + trace update → reload and confirm restoration."""
 import sys
@@ -48,6 +48,8 @@ with sync_playwright() as p:
     check("A 2018-11-08" in txt and "B 2018-10-25" in txt, "availability checked for both dates")
     print("     ", [l for l in txt.splitlines() if l.startswith("A 2018") or "· B" in l][:2])
     pg.screenshot(path=str(out / "flow-01-date-A.png"))
+    pg.get_by_role("button", name="Overlay", exact=True).click()
+    pg.wait_for_timeout(300)
     pg.get_by_role("button", name="Flip to B").click()
     pg.wait_for_timeout(2500)
     check("100% B" in pg.locator(".map-legend").inner_text(), "flip shows date B (legend 100% B)")

@@ -272,3 +272,12 @@ details.events > summary { list-style: none; }
 
 .focusbar { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-variant-numeric: tabular-nums; }
 .focusbar b { color: var(--text-2); font-weight: 500; }
+
+.swipe-b { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.swipe-handle { position: absolute; top: 0; bottom: 0; width: 3px; margin-left: -1.5px; background: var(--paper); z-index: 3; cursor: ew-resize; touch-action: none; }
+.swipe-handle span { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--paper); color: var(--ink); border-radius: 12px; padding: 3px 7px; font-size: 11px; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,.4); white-space: nowrap; }
+.swipe-handle:focus-visible span { outline: 2px solid var(--focus); }
+.swipe-label { position: absolute; top: 10px; z-index: 3; background: rgba(17,24,32,.9); border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; pointer-events: none; }
+.swipe-label.left { left: 52px; } .swipe-label.right { right: 52px; }
+.img-state { font-size: 11px; padding: 0 5px; border-radius: 4px; border: 1px solid currentColor; margin-left: 4px; }
+.img-state.loaded { color: var(--teal); } .img-state.loading { color: var(--text-3); } .img-state.missing { color: var(--amber); } .img-state.error { color: var(--red); }

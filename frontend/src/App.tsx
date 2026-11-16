@@ -92,7 +92,7 @@ export default function App() {
       setTab((i.config.view.inspector_tab as Tab) || 'analysis')
       try { localStorage.setItem('ei_last_inv', id) } catch { /* ignore */ }
       history.replaceState(null, '', `?inv=${id}`)
-      if (fly) setFlyKey(id + Date.now())
+      if (fly) setFlyKey((i.config.view.camera_saved ? 'restore:' : 'fit:') + id + Date.now())
       setChange(null)
       const r = await loadResults(id)
       if (!isActive(id)) return
@@ -189,6 +189,7 @@ export default function App() {
     try { const i = await api.post<Investigation>(`/api/investigations/${inv.id}/revisions/${rid}/activate`); setInv(i); setChange(null); patchView({ last_change: null }); setMatch(await api.get<MatchRun>(`/api/investigations/${inv.id}/match`)); say('Switched revision; later revisions are kept.') } catch (e) { fail(e) }
   }
   const [trail, setTrail] = useState<string[]>([])
+  const [imgState, setImgState] = useState<{ A: string; B: string }>({ A: 'loading', B: 'loading' })
   const showNode = (id: string, fromTrail = false) => {
     setNodeId(id); setTab('evidence'); setInspOpen(true)
     const next = fromTrail ? trail.slice(0, trail.indexOf(id) + 1) : [...trail.filter(x => x !== id), id].slice(-10)
@@ -214,14 +215,37 @@ export default function App() {
   const imageryDateB = inv?.config.view.imagery_date_b ?? null
   const imageryMix = inv?.config.view.imagery_mix ?? 0
   const today = new Date().toISOString().slice(0, 10)
+  const compareMode: 'swipe' | 'overlay' = inv?.config.view.imagery_compare === 'overlay' ? 'overlay' : 'swipe'
+  const imagerySwipe = inv?.config.view.imagery_swipe ?? 0.5
+  const latestCheck = inv?.config.view.imagery_latest_check ?? null
+  // Server-side tile probe whenever a date changes: distinguishes a 404 (missing) from a provider error;
+  // map tile events then confirm 'loaded'. A missing date is never replaced by another date.
+  useEffect(() => {
+    if (!inv || !layers.imagery || !geometry) return
+    const id = inv.id
+    const [lon, lat] = geometry.type === 'bbox' ? [(geometry.west + geometry.east) / 2, (geometry.south + geometry.north) / 2] : [geometry.lon, geometry.lat]
+    const z = 5, n = 2 ** z
+    const x = Math.floor(((lon + 180) / 360) * n)
+    const y = Math.floor(((1 - Math.log(Math.tan((lat * Math.PI) / 180) + 1 / Math.cos((lat * Math.PI) / 180)) / Math.PI) / 2) * n)
+    const probe = (side: 'A' | 'B', d: string | null) => d && api.get<any>(`/api/imagery/check?date=${d}&z=${z}&x=${x}&y=${y}`)
+      .then(r => { if (isActive(id) && r.state !== 'available') setImgState(s => ({ ...s, [side]: r.state === 'missing' ? 'missing' : 'error' })) })
+      .catch(() => { if (isActive(id)) setImgState(s => ({ ...s, [side]: 'error' })) })
+    probe('A', imageryDate)
+    probe('B', imageryDateB)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inv?.id, layers.imagery, imageryDate, imageryDateB])
+  const checkUpdates = async () => {
+    try { const r = await api.get<any>('/api/imagery/latest'); patchView({ imagery_latest_check: { latest_date: r.latest_date, checked_at: r.checked_at } }) }
+    catch (e: any) { patchView({ imagery_latest_check: { error: e.message, checked_at: new Date().toISOString() } }) }
+  }
   // The one canonical focus every panel reads from.
   const focusState = inv ? {
     investigation: inv.id,
     revision: inv.current_revision_id,
     revisionSeq: inv.revisions.find(r => r.id === inv.current_revision_id)?.seq,
     claim: nodeId,
-    observation: imageryDateB && imageryMix >= 0.5 ? imageryDateB : imageryDate,
-    observationLabel: imageryDateB ? (imageryMix >= 0.5 ? 'B' : 'A') : null,
+    observation: imageryDateB && compareMode === 'swipe' ? `${imageryDate} | B ${imageryDateB}` : imageryDateB && imageryMix >= 0.5 ? imageryDateB : imageryDate,
+    observationLabel: imageryDateB ? (compareMode === 'swipe' ? 'A' : imageryMix >= 0.5 ? 'B' : 'A') : null,
     graph: match?.graph_version ?? null,
     matchRun: match?.id ?? null,
   } : null
@@ -330,13 +354,20 @@ export default function App() {
               </label>
               {layers.imagery && inv && (
                 <div style={{ padding: '0 12px 6px 34px' }}>
-                  <div className="row"><span className="small muted" style={{ width: 14 }}>A</span><input type="date" className="input" value={imageryDate || ''} min="2000-02-24" max={today} onChange={e => { setImgCheck(null); patchView({ imagery_date: e.target.value }) }} aria-label="Imagery date A" /></div>
+                  <p className="small" style={{ margin: '0 0 4px', color: 'var(--amber)' }}>Visual comparison only — no burned area, smoke extent or prediction is derived from colours.</p>
+                  <div className="row"><span className="small muted" style={{ width: 14 }}>A</span><input type="date" className="input" value={imageryDate || ''} min="2000-02-24" max={today} onChange={e => { setImgCheck(null); patchView({ imagery_date: e.target.value }) }} aria-label="Imagery date A" /><span className={`img-state ${imgState.A}`} data-testid="img-state-A">{imgState.A}</span></div>
                   {imageryDateB ? (
                     <>
-                      <div className="row" style={{ marginTop: 4 }}><span className="small muted" style={{ width: 14 }}>B</span><input type="date" className="input" value={imageryDateB} min="2000-02-24" max={today} onChange={e => { setImgCheck(null); patchView({ imagery_date_b: e.target.value }) }} aria-label="Imagery date B" /><button className="btn sm ghost" onClick={() => patchView({ imagery_date_b: null, imagery_mix: 0 })} aria-label="Remove comparison date">✕</button></div>
-                      <label className="row small muted" style={{ marginTop: 6 }}>A <input type="range" min={0} max={1} step={0.05} value={imageryMix} onChange={e => patchView({ imagery_mix: +e.target.value })} aria-label="Crossfade between date A and date B" style={{ flex: 1 }} /> B</label>
-                      <div className="row" style={{ marginTop: 4 }}>
-                        <button className="btn sm" onClick={() => patchView({ imagery_mix: imageryMix < 0.5 ? 1 : 0 })} title="Switch instantly between the two real observation dates">Flip to {imageryMix < 0.5 ? 'B' : 'A'}</button>
+                      <div className="row" style={{ marginTop: 4 }}><span className="small muted" style={{ width: 14 }}>B</span><input type="date" className="input" value={imageryDateB} min="2000-02-24" max={today} onChange={e => { setImgCheck(null); patchView({ imagery_date_b: e.target.value }) }} aria-label="Imagery date B" /><span className={`img-state ${imgState.B}`} data-testid="img-state-B">{imgState.B}</span><button className="btn sm ghost" onClick={() => patchView({ imagery_date_b: null, imagery_mix: 0 })} aria-label="Remove comparison date">✕</button></div>
+                      <div className="seg" role="group" aria-label="Comparison mode" style={{ marginTop: 6 }}>
+                        <button aria-pressed={compareMode === 'swipe'} onClick={() => patchView({ imagery_compare: 'swipe' })}>Swipe</button>
+                        <button aria-pressed={compareMode === 'overlay'} onClick={() => patchView({ imagery_compare: 'overlay' })}>Overlay</button>
+                      </div>
+                      {compareMode === 'overlay' && <label className="row small muted" style={{ marginTop: 6 }}>A <input type="range" min={0} max={1} step={0.05} value={imageryMix} onChange={e => patchView({ imagery_mix: +e.target.value })} aria-label="Crossfade between date A and date B" style={{ flex: 1 }} /> B</label>}
+                      <div className="row wrap" style={{ marginTop: 4 }}>
+                        {compareMode === 'overlay'
+                          ? <button className="btn sm" onClick={() => patchView({ imagery_mix: imageryMix < 0.5 ? 1 : 0 })} title="Switch instantly between the two real observation dates">Flip to {imageryMix < 0.5 ? 'B' : 'A'}</button>
+                          : <button className="btn sm" onClick={() => patchView({ imagery_swipe: 0.5 })}>Center swipe</button>}
                         <button className="btn sm" onClick={checkImagery}>Check both</button>
                       </div>
                     </>
@@ -348,7 +379,11 @@ export default function App() {
                   )}
                   <label className="row small muted" style={{ marginTop: 4 }}>Opacity <input type="range" min={0.1} max={1} step={0.05} value={layers.imagery_opacity} onChange={e => setLayer('imagery_opacity', +e.target.value)} /></label>
                   {imgCheck && <p className="small muted" style={{ margin: '2px 0' }}>{imgCheck}</p>}
-                  <p className="small muted" style={{ margin: 0 }}>Real daily MODIS tiles only — no interpolated frames. Imagery dates are separate from the analysis period.</p>
+                  <div className="row wrap" style={{ marginTop: 4 }}>
+                    <button className="btn sm" onClick={checkUpdates}>Check for updates</button>
+                  </div>
+                  {latestCheck && <p className="small muted" style={{ margin: '2px 0' }} data-testid="latest-check">{latestCheck.error ? `GIBS check failed: ${latestCheck.error}` : `Newest MODIS date on GIBS: ${latestCheck.latest_date}`} · checked {latestCheck.checked_at?.replace('T', ' ').replace('+00:00', ' UTC')} (manual check; no background monitoring)</p>}
+                  <p className="small muted" style={{ margin: 0 }}>Real daily MODIS tiles only — no interpolated frames. Imagery dates are separate from the {inv.config.period.start.slice(0, 4)}–{inv.config.period.end.slice(0, 4)} monthly trend window.</p>
                 </div>
               )}
             </div>
@@ -382,9 +417,11 @@ export default function App() {
       {/* ---------------------------------------------- map */}
       <main className="mapwrap">
         <MapView geometry={geometry} support={r0?.spatial_support || null} cellCenters={r0?.cell_centers || []} eventPoint={eventPoint}
-          layers={inv ? layers : { ...DEFAULT_LAYERS, grid: false }} imageryDate={imageryDate} imageryDateB={imageryDateB} imageryMix={imageryMix} flyKey={flyKey} highlight={highlight}
+          layers={inv ? layers : { ...DEFAULT_LAYERS, grid: false }} imageryDate={imageryDate} imageryDateB={imageryDateB} imageryMix={imageryMix} flyKey={flyKey}
+          compareMode={compareMode} swipe={imagerySwipe} onSwipe={v => patchView({ imagery_swipe: +v.toFixed(3) })}
+          onImageryStatus={(side, st) => setImgState(s => (s[side] === st || ((s[side] === 'missing' || s[side] === 'error') && st === 'loaded') ? s : { ...s, [side]: st }))} highlight={highlight}
           center={inv?.config.view.center || [10, 20]} zoom={inv?.config.view.zoom || 1.6}
-          onView={(c, z) => inv && patchView({ center: c, zoom: z })} />
+          onView={(c, z) => inv && (c[0] !== inv.config.view.center[0] || c[1] !== inv.config.view.center[1] || z !== inv.config.view.zoom) && patchView({ center: c, zoom: z, camera_saved: true })} />
         {health === 'down' && <div className="map-status" style={{ borderColor: 'var(--red)' }}>Backend unreachable — start the server (see README).</div>}
         {!inv && !preview && (
           <div className="map-status" style={{ top: 'auto', bottom: 70, right: '50%', transform: 'translateX(50%)', maxWidth: 520, padding: 14 }}>

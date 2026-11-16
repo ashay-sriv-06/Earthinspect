@@ -329,13 +329,42 @@ def imagery_check(date: str, z: int = 5, x: int = 17, y: int = 10):
         raise ApiError("invalid_date", "Date must be YYYY-MM-DD.")
     z, x, y = max(0, min(int(z), 9)), max(0, int(x)), max(0, int(y))
     url = f"https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/{GIBS_LAYER}/default/{date}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg"
+    checked_at = db.now_iso()
     try:
         r = httpx.get(url, timeout=15)
         ok = r.status_code == 200 and r.headers.get("content-type", "").startswith("image")
     except Exception:
-        return {"available": None, "reason": "GIBS did not respond", "layer": GIBS_LAYER}
-    return {"available": ok, "status": r.status_code, "layer": GIBS_LAYER, "date": date,
-            "reason": None if ok else "No imagery tile for this date/location."}
+        return {"available": None, "state": "provider_error", "reason": "GIBS did not respond", "layer": GIBS_LAYER,
+                "date": date, "checked_at": checked_at}
+    state = "available" if ok else ("missing" if r.status_code in (400, 404) else "provider_error")
+    return {"available": ok, "state": state, "status": r.status_code, "layer": GIBS_LAYER, "date": date,
+            "checked_at": checked_at, "tile": {"z": z, "x": x, "y": y},
+            "reason": None if ok else ("GIBS has no tile for this date here." if state == "missing" else f"GIBS returned HTTP {r.status_code}.")}
+
+
+@app.get("/api/imagery/latest")
+def imagery_latest():
+    """Manual 'check for updates': ask GIBS DescribeDomains for the layer's newest available date. Not a monitor."""
+    import datetime as dt
+    checked_at = db.now_iso()
+    today = dt.date.today()
+    rng = f"{(today - dt.timedelta(days=60)).isoformat()}--{(today + dt.timedelta(days=1)).isoformat()}"
+    url = f"https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/1.0.0/{GIBS_LAYER}/default/GoogleMapsCompatible_Level9/all/{rng}.xml"
+    try:
+        r = httpx.get(url, timeout=20)
+        r.raise_for_status()
+        m = re.search(r"<Domain>([^<]+)</Domain>", r.text)
+    except Exception as e:
+        raise ApiError("provider_unavailable", f"GIBS DescribeDomains failed ({type(e).__name__}).", status=503,
+                       detail={"checked_at": checked_at})
+    domain = m.group(1) if m else None
+    latest = None
+    if domain:
+        last = domain.split(",")[-1].split("/")
+        latest = last[1] if len(last) > 1 else last[0]
+    return {"layer": GIBS_LAYER, "latest_date": latest[:10] if latest else None, "domain_queried": rng,
+            "domain": domain, "checked_at": checked_at, "source": "NASA GIBS WMTS DescribeDomains",
+            "note": "Manual check on request; EarthInspect runs no background monitor."}
 
 
 # ------------------------------------------------------------------ static frontend

@@ -529,7 +529,8 @@ def create_demo_investigation(session_id: str) -> dict:
     run_trends_for(session_id, iid)
     r0 = inv["current_revision_id"]
     update_view(session_id, iid, {"view": {"imagery_date": DEMO_SPEC["imagery_date"], "imagery_date_b": DEMO_SPEC["imagery_date_b"],
-                                           "imagery_mix": 0, "layers": {**inv["config"]["view"]["layers"], "imagery": True},
+                                           "imagery_mix": 0, "imagery_compare": "swipe", "imagery_swipe": 0.5,
+                                           "layers": {**inv["config"]["view"]["layers"], "imagery": True},
                                            "inspector_tab": "leads"}})
     inv = add_revision(session_id, iid, dict(DEMO_SPEC["assumption"]))
     return update_view(session_id, iid, {"view": {"last_change": {"from": r0, "to": inv["current_revision_id"]}}})

@@ -73,3 +73,6 @@ Demo choice: Camp Fire 2018 — complete v1.1 analysis, working GIBS dates 2018-
 
 **Sprint 3 result (22:23):** `POST /api/demo` reproduces the canonical Camp Fire demo in the caller's session (idempotent; isolation preserved). `App.tsx` keeps one canonical focus {investigation, revision, claim, observation date, graph version} shown in the inspector focus bar; stale async responses from a previously selected investigation are dropped. `scripts/demo_check.py` 13/13 (docs/demo_check_output.txt). Regression: pytest 20/20, e2e 31/31, flow 18/18. Model credential: not configured (guided mode only).
 
+
+**Prompt 2 (22:34):** swipe comparison (second camera-locked MapLibre instance clipped at the divider; Overlay/Flip kept), actual date label per side, per-side state loaded/loading/missing/error (map tile events + server probe; 404 = missing, never substituted), Check for updates via GIBS DescribeDomains with UTC checked-at (manual; no monitor), visual-comparison label, imagery dates shown separate from the 2001–2024 trend window, swipe/dates/opacity/mode persisted, camera saved only on user gestures and restored on reopen. scripts/imagery_check.py 15/15 (docs/imagery_check_output.txt).
+

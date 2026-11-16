@@ -7,6 +7,7 @@ import type { Geometry } from './api'
 maplibregl.setWorkerUrl(workerUrl)
 const GIBS_BASE = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best'
 
+export type ImgState = 'loading' | 'loaded' | 'missing' | 'error'
 export interface Layers { footprint: boolean; grid: boolean; event: boolean; imagery: boolean; imagery_opacity: number; basemap: boolean }
 interface Props {
   geometry: Geometry | null
@@ -17,6 +18,10 @@ interface Props {
   imageryDate: string | null
   imageryDateB?: string | null
   imageryMix?: number // 0 = show date A, 1 = show date B (real tiles only; no interpolated frames)
+  compareMode?: 'overlay' | 'swipe'
+  swipe?: number // 0..1 position of the swipe divider
+  onSwipe?: (v: number) => void
+  onImageryStatus?: (side: 'A' | 'B', state: ImgState) => void
   flyKey: string // changes only on explicit user navigation
   highlight: boolean
   center: [number, number]
@@ -44,6 +49,28 @@ export default function MapView(p: Props) {
   const [tileErr, setTileErr] = useState<string | null>(null)
   const onViewRef = useRef(p.onView)
   onViewRef.current = p.onView
+  const statusRef = useRef(p.onImageryStatus)
+  statusRef.current = p.onImageryStatus
+  const elB = useRef<HTMLDivElement>(null)
+  const mapB = useRef<maplibregl.Map | null>(null)
+  const swipeMode = p.compareMode === 'swipe' && !!p.imageryDateB && p.layers.imagery && !!p.imageryDate
+  const dragging = useRef(false)
+
+  // Track real tile outcomes per side: a loaded clear-sky tile is 'loaded'; HTTP 404/400 is 'missing'.
+  const watch = (mm: maplibregl.Map, sourceId: string, side: 'A' | 'B') => {
+    let failed = false
+    const onErr = (e: any) => {
+      if (e?.sourceId !== sourceId) return
+      failed = true
+      const st = e?.error?.status
+      statusRef.current?.(side, st === 404 || st === 400 ? 'missing' : 'error')
+    }
+    const onData = (e: any) => {
+      if (e?.sourceId === sourceId && e.isSourceLoaded && !failed) statusRef.current?.(side, 'loaded')
+    }
+    mm.on('error', onErr); mm.on('sourcedata', onData)
+    return () => { mm.off('error', onErr); mm.off('sourcedata', onData) }
+  }
 
   useEffect(() => {
     if (!el.current) return
@@ -93,7 +120,9 @@ export default function MapView(p: Props) {
       if (src === 'gibs') setTileErr('NASA GIBS imagery tiles failed to load for this date.')
       else if (src === 'basemap') setTileErr('Some basemap tiles failed to load; analysis overlays still render.')
     })
-    m.on('moveend', () => { const c = m.getCenter(); onViewRef.current([+c.lng.toFixed(4), +c.lat.toFixed(4)], +m.getZoom().toFixed(2)) })
+    // Persist only user-initiated camera moves (drag/zoom/controls carry originalEvent); programmatic fits and
+    // resizes never overwrite a saved camera.
+    m.on('moveend', (e: any) => { if (!e?.originalEvent) return; const c = m.getCenter(); onViewRef.current([+c.lng.toFixed(4), +c.lat.toFixed(4)], +m.getZoom().toFixed(2)) })
     return () => { m.remove(); map.current = null }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -126,23 +155,61 @@ export default function MapView(p: Props) {
     if (!m || !ready) return
     for (const id of ['gibsB', 'gibs']) { if (m.getLayer(id)) m.removeLayer(id); if (m.getSource(id)) m.removeSource(id) }
     setTileErr(null)
+    const offs: (() => void)[] = []
     if (p.layers.imagery && p.imageryDate) {
+      statusRef.current?.('A', 'loading')
+      offs.push(watch(m, 'gibs', 'A'))
       m.addSource('gibs', { type: 'raster', tiles: [GIBS(p.imageryDate)], tileSize: 256, maxzoom: 9, attribution: 'Imagery: NASA EOSDIS GIBS / Worldview (MODIS Terra)' })
       m.addLayer({ id: 'gibs', type: 'raster', source: 'gibs', paint: { 'raster-opacity': p.layers.imagery_opacity, 'raster-fade-duration': 0 } }, 'coast')
-      if (p.imageryDateB) {
+      if (p.imageryDateB && !swipeMode) {
+        statusRef.current?.('B', 'loading')
+        offs.push(watch(m, 'gibsB', 'B'))
         m.addSource('gibsB', { type: 'raster', tiles: [GIBS(p.imageryDateB)], tileSize: 256, maxzoom: 9 })
         m.addLayer({ id: 'gibsB', type: 'raster', source: 'gibsB', paint: { 'raster-opacity': p.layers.imagery_opacity * (p.imageryMix ?? 0), 'raster-fade-duration': 0 } }, 'coast')
       }
     }
+    return () => offs.forEach(f => f())
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, p.layers.imagery, p.imageryDate, p.imageryDateB])
+  }, [ready, p.layers.imagery, p.imageryDate, p.imageryDateB, swipeMode])
+
+  // Swipe: a second map renders ONLY date B, clipped right of the divider, camera locked to the main map.
+  useEffect(() => {
+    const m = map.current
+    if (!m || !ready || !swipeMode || !elB.current || !p.imageryDateB) return
+    const b = new maplibregl.Map({
+      container: elB.current, interactive: false, attributionControl: false,
+      center: m.getCenter(), zoom: m.getZoom(), bearing: m.getBearing(), pitch: m.getPitch(),
+      style: { version: 8, sources: { gibs: { type: 'raster', tiles: [GIBS(p.imageryDateB)], tileSize: 256, maxzoom: 9 } },
+        layers: [{ id: 'bg', type: 'background', paint: { 'background-color': '#0c1218' } }, { id: 'gibs', type: 'raster', source: 'gibs', paint: { 'raster-opacity': p.layers.imagery_opacity, 'raster-fade-duration': 0 } }] },
+    })
+    mapB.current = b
+    statusRef.current?.('B', 'loading')
+    const off = watch(b, 'gibs', 'B')
+    const sync = () => b.jumpTo({ center: m.getCenter(), zoom: m.getZoom(), bearing: m.getBearing(), pitch: m.getPitch() })
+    m.on('move', sync)
+    b.on('load', () => {
+      if (p.geometry && p.geometry.type === 'bbox') {
+        b.addSource('fp', { type: 'geojson', data: { type: 'FeatureCollection', features: [bboxPoly(p.geometry)!] } })
+        b.addLayer({ id: 'fp', type: 'line', source: 'fp', paint: { 'line-color': '#d5a555', 'line-width': 2 } })
+      }
+    })
+    const ro = new ResizeObserver(() => b.resize())
+    ro.observe(elB.current)
+    return () => { m.off('move', sync); off(); ro.disconnect(); b.remove(); mapB.current = null }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, swipeMode, p.imageryDateB])
+  useEffect(() => {
+    const b = mapB.current
+    if (b && b.isStyleLoaded() && b.getLayer('gibs')) b.setPaintProperty('gibs', 'raster-opacity', p.layers.imagery_opacity)
+  }, [p.layers.imagery_opacity, swipeMode])
+
   useEffect(() => {
     const m = map.current
     if (!m || !ready) return
-    const mix = p.imageryDateB ? (p.imageryMix ?? 0) : 0
+    const mix = p.imageryDateB && !swipeMode ? (p.imageryMix ?? 0) : 0
     if (m.getLayer('gibs')) m.setPaintProperty('gibs', 'raster-opacity', p.layers.imagery_opacity * (1 - mix))
     if (m.getLayer('gibsB')) m.setPaintProperty('gibsB', 'raster-opacity', p.layers.imagery_opacity * mix)
-  }, [ready, p.layers.imagery_opacity, p.imageryMix, p.imageryDateB])
+  }, [ready, p.layers.imagery_opacity, p.imageryMix, p.imageryDateB, swipeMode])
 
   // fly only on explicit navigation
   useEffect(() => {
@@ -150,6 +217,7 @@ export default function MapView(p: Props) {
     if (!m || !ready || !p.flyKey) return
     const g = p.geometry
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (p.flyKey.startsWith('restore:')) { m.jumpTo({ center: p.center, zoom: p.zoom }); return } // reopen: saved camera, no refit
     if (g && g.type === 'bbox') {
       const pad = Math.max(g.east - g.west, g.north - g.south) * 0.35
       m.fitBounds([[g.west - pad, g.south - pad], [g.east + pad, g.north + pad]], { animate: !reduce, duration: 900 })
@@ -171,6 +239,26 @@ export default function MapView(p: Props) {
   return (
     <>
       <div ref={el} style={{ position: 'absolute', inset: 0 }} aria-label="Investigation map" role="region" />
+      {swipeMode && (() => {
+        const pct = Math.round((p.swipe ?? 0.5) * 1000) / 10
+        const move = (e: React.PointerEvent<HTMLDivElement>) => {
+          if (!dragging.current) return
+          const r = (e.currentTarget.parentElement as HTMLElement).getBoundingClientRect()
+          p.onSwipe?.(Math.max(0.02, Math.min(0.98, (e.clientX - r.left) / r.width)))
+        }
+        return (
+          <>
+            <div ref={elB} className="swipe-b" style={{ clipPath: `inset(0 0 0 ${pct}%)` }} aria-hidden />
+            <div className="swipe-handle" style={{ left: `${pct}%` }} role="slider" aria-label="Swipe between imagery dates" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} tabIndex={0}
+              onKeyDown={e => { if (e.key === 'ArrowLeft') p.onSwipe?.(Math.max(0.02, (p.swipe ?? 0.5) - 0.05)); if (e.key === 'ArrowRight') p.onSwipe?.(Math.min(0.98, (p.swipe ?? 0.5) + 0.05)) }}
+              onPointerDown={e => { dragging.current = true; e.currentTarget.setPointerCapture(e.pointerId) }} onPointerMove={move} onPointerUp={() => { dragging.current = false }}>
+              <span>⟨ ⟩</span>
+            </div>
+            <div className="swipe-label left">A · {p.imageryDate}</div>
+            <div className="swipe-label right">B · {p.imageryDateB}</div>
+          </>
+        )
+      })()}
       {err && <div className="map-fallback"><div><b>Map unavailable</b><p>{err}</p></div></div>}
       {tileErr && <div className="map-status" role="status">{tileErr}</div>}
       {!err && (
