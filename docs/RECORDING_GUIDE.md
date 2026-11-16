@@ -1,6 +1,6 @@
-# EarthInspect — Recording Guide
+﻿# EarthInspect — Recording Guide
 
-Built from the verified build (commit `42340d2` plus one wording fix: the Changes tab now says "Highest-ranked lead" using titles, matching the Leads banner).
+Built from the verified build (commit `20bc530` plus one wording fix: the Changes tab now says "Highest-ranked lead" using titles, matching the Leads banner).
 
 **Rehearsal.** The click sequence below was rehearsed in a real headless Chromium against the running app on 2026-11-15, at 1440×900 and at 1536×864 (the CSS size of a 1920×1080 screen at 125% zoom). Every step completed with no page errors. Logs are in `docs/rehearsal_1440x900.txt` and `docs/rehearsal_1536x864.txt`; frames are in `docs/recording/<size>/`. Raw clicking takes about 34 s; the rest of the 2 minutes is narration pace.
 
