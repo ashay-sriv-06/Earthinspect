@@ -9,7 +9,7 @@ PASS Inspect finding opens the computed finding's evidence sheet
 PASS evidence trail breadcrumbs appear after drilling into provenance
 PASS Back returns to the finding
 PASS assessment-updated banner appears after the revision
-      ASSESSMENT UPDATED | ✕ |  | R1 set requirement — “Scenario: Paradise-like community adjacent to wildland fuels (planning assumption).” |  | Top lead: Collaborative evacuation planning with realistic, repeated training exercises (NIST R-EP 1 to R-EP 4) → Resilient, multi-modal emergency notification 
+      ASSESSMENT UPDATED | ✕ | R1 set requirement · req-wui-exposure: unknown (not recorded) → satisfied (planning assumption — not a sourced fact) | Assumption text: “Scenario: Paradise-like community adjacent to wildland fuels (planning assumption).” |  | Highest-ranked lead: Collaborative evacuation pl
 PASS banner shows before → after states from what-changed
 PASS trace marks changed nodes (3)
 PASS new assumption node appears in trace with assumption styling

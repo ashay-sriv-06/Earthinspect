@@ -1,4 +1,4 @@
-﻿PASS demo opened; focus bar shows same investigation as URL (inv-418f760c5d48)
+﻿PASS demo opened; focus bar shows same investigation as URL (inv-a84e9e171715)
 PASS command bar names the same investigation
 PASS focus bar shows revision R1 (labelled assumption applied)
 PASS focus bar shows observation date A 2018-11-08

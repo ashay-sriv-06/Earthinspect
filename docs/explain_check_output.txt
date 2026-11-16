@@ -11,7 +11,7 @@ PASS weak analyst-only mapping flagged as conditional
 PASS each mapping marked listed vs not listed by source
 PASS selecting claim find-fe32c12dd125-T2M marks its interval on the chart
 PASS graph opens with the same claim selected
-PASS clicking a source node in the graph updates the canonical claim (inv-43f3566621f2)
+PASS clicking a source node in the graph updates the canonical claim (inv-8d833396d251)
 PASS source node shows original-document link
 PASS evidence tab shows the claim selected in the graph
 PASS no page errors []

@@ -1,0 +1,9 @@
+﻿PASS server reports no model credential (value never exposed)
+PASS LLM mode refused cleanly without a key (no paid call attempted)
+PASS guided run done and labelled (Guided analysis (deterministic templates, no language model))
+PASS real tool events: ['acquire_started', 'analysis_reused', 'answer_ready', 'cache_cached', 'dataset_selected', 'graph_updated', 'match_run', 'precedent_retrieved', 'run_started', 'tool_call', 'tool_result']
+PASS answer states the assumption in effect, cited to its node: In effect at revision rev-ce9b776fa866-1: req-wui-exposure = satisfied — planning assumption (not a sourced fact). Leads ['asm-rev-ce9b776fa866-1']
+PASS answer carries the retrospective notice
+PASS findings and precedents all cited
+PASS no unsupported claims needed removal (0)
+8/8 passed

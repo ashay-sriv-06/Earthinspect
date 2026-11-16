@@ -120,3 +120,20 @@ Source correctness tied on Q3, Q6 and Q8. The baseline has no mechanism, prerequ
 - **Matching:** the requirement mappings and "decisive" flags are analyst judgements, labelled in the data (`overlay_note`).
 - **Imagery check:** tested one tile at zoom 5 near the footprint centre. Cloud cover is not assessed. Headless runs logged occasional HTTP 500s from external GIBS tile requests. They were not reproducible on direct tile requests, the app server logged no 500s, and the map degrades gracefully.
 - **Not built (cut per pack order):** 3D, animated playback, dual synchronized maps, additional numerical providers, daily feeds.
+
+## Sprint 3 / Prompts 2–6 (2026-11-15 22:41 PST, local, headless Chromium + API)
+| suite | result | output |
+|---|---|---|
+| pytest | 20/20 | — |
+| API e2e | 31/31 | docs/e2e_output.txt |
+| interactive target flow | 18/18 | docs/flow_check_output.txt |
+| canonical demo + focus | 13/13 | docs/demo_check_output.txt |
+| A/B imagery swipe, states, persistence, update check | 15/15 | docs/imagery_check_output.txt |
+| synchronized inspection + explained assumption change | 17/17 | docs/explain_check_output.txt |
+| copilot (no credential → guided) | 8/8 | docs/copilot_check_output.txt |
+
+Findings worth stating plainly:
+- **Imagery.** MODIS tiles for 2018-11-08 and 2018-10-25 load for the Camp Fire footprint. A 2030 date returns HTTP 404 and is shown as *missing*, never substituted. The comparison is visual only.
+- **Assumption change is conditional.** The demo's assumption (eq-wui-exposure = satisfied) moves multichannel notification to *candidate lead*. That prerequisite is an analyst-added applicability condition, not one of NIST's listed prerequisites, so the UI labels the change a conditional assessment. The matching rules were not changed to produce it.
+- **Retrospective.** The case uses post-event documents and imagery, and the UI says so.
+- **LLM copilot.** It remains unverified end to end because no server-side credential is configured. Guided mode is the verified path.
