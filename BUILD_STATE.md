@@ -50,3 +50,26 @@ Phases (derived from the target flow; the pasted brief did not list them):
 | 5 Graph + assessment update | ✅ | Automatic what-changed banner (eligibility, match, coverage, feature states, top lead); Trace marks changed nodes and shows the new Assumption node. Example: assuming WUI exposure moved top lead evacuation planning → multichannel notification (needs local evidence → candidate lead). |
 | 6 Reopen saved result | ✅ | Reload restores imagery A/B + mix, inspector tab, evidence trail/selected node, last change banner, revisions. |
 Regression: pytest 20/20, e2e 31/31. Finished 22:17, ~52 min before deadline. No backend schema changes; view state uses the existing investigation view config.
+
+## Sprint 3 — canonical demo state (22:21 PST)
+**Inspection (verified in code, not just the report):**
+| concern | frontend | backend endpoint → function |
+|---|---|---|
+| Investigation selection/persistence | `App.tsx` openInv (L78), patchView (L96), ?inv= URL + localStorage | GET/POST `/api/investigations`, GET/PATCH `/api/investigations/{iid}` → services.create_investigation / get_investigation / update_view |
+| GIBS imagery dates | `App.tsx` imageryDate/imageryDateB/imageryMix, checkImagery; `MapView.tsx` gibs/gibsB layers | GET `/api/imagery/check` (main.py); dates stored in view config via PATCH |
+| Findings & provenance | `panels.tsx` AnalysisPanel/TrendCard, EvidencePanel; `Timeline.tsx` readout | POST `/analyze` → services.run_trends_for; GET `/results`; GET `/api/graph/node`, `/provenance`, `/neighborhood` |
+| Matching & revisions | `panels.tsx` LeadsPanel/ReqActions/ChangeBanner/ChangesPanel; `App.tsx` revise/loadChange | GET `/match` → matching.run_match; POST `/revisions` → services.add_revision; POST `/revisions/{rid}/activate`; GET `/what-changed` |
+| Graph rendering | `TraceView.tsx` (React Flow, layered) | GET `/trace/{intervention_id}` → trace.build |
+| Copilot | `CopilotPanel.tsx` (polls run) | POST/GET `/copilot`, GET `/api/copilot/{rid}`, POST cancel → copilot.start/_execute (guided | llm) |
+Server-side model credential: **not configured** (`/api/health` llm.available=false); guided mode only.
+Demo choice: Camp Fire 2018 — complete v1.1 analysis, working GIBS dates 2018-11-08 (plume) / 2018-10-25 (clear), assumption *WUI exposure satisfied* changes top lead (evacuation planning → multichannel notification). Existing copy inv-3973d5c0d363 is owned by a test session (isolation holds), so the demo is reproduced per caller.
+
+**Checklist (next five phases → files/endpoints):**
+1. Canonical demo: `POST /api/demo` (main.py) → services.create_demo_investigation (create_investigation → run_trends_for → update_view → add_revision); `App.tsx` "Open demo investigation" (empty state + palette).
+2. Canonical focus state: `App.tsx` single `focus` = {investigation, revision, claim, observation date, graph version}; stale-response guard on investigation switch; focus bar in inspector footer.
+3. Observation dates → claim: date A/B shown in focus bar; `Timeline.tsx` marks imagery dates on the series.
+4. Claim → evidence → revision: EvidencePanel / ReqActions reuse `/api/graph/*` + `/revisions` (no new endpoints).
+5. Update + reopen: `/what-changed` banner + `/trace` with changed nodes; `?inv=` reload restores focus (view config).
+
+**Sprint 3 result (22:23):** `POST /api/demo` reproduces the canonical Camp Fire demo in the caller's session (idempotent; isolation preserved). `App.tsx` keeps one canonical focus {investigation, revision, claim, observation date, graph version} shown in the inspector focus bar; stale async responses from a previously selected investigation are dropped. `scripts/demo_check.py` 13/13 (docs/demo_check_output.txt). Regression: pytest 20/20, e2e 31/31, flow 18/18. Model credential: not configured (guided mode only).
+

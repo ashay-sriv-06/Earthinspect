@@ -504,6 +504,37 @@ def latest_findings(session_id: str, iid: str) -> list[dict]:
     return sorted(out, key=lambda n: n["props"]["variable"])
 
 
+DEMO_SPEC = {
+    "case_id": "camp-fire-2018",
+    "title": "Demo — Camp Fire 2018 investigation",
+    "imagery_date": "2018-11-08",    # event day: MODIS shows the smoke plume
+    "imagery_date_b": "2018-10-25",  # two weeks earlier: clear
+    "assumption": {
+        "kind": "set_requirement", "requirement_id": "req-wui-exposure", "state": "satisfied",
+        "basis": "analyst_assumption",
+        "rationale": "Demo scenario: target community is adjacent to wildland fuels (planning assumption, not a sourced fact).",
+    },
+}
+
+
+def create_demo_investigation(session_id: str) -> dict:
+    """Reproduce the canonical demonstration investigation inside the CALLER's session using only existing
+    services (case → cached NASA analysis → imagery dates → one labelled planning assumption). Idempotent per session."""
+    with db.conn() as c:
+        r = c.execute("SELECT id FROM investigations WHERE session_id=? AND title=?", (session_id, DEMO_SPEC["title"])).fetchone()
+    if r:
+        return get_investigation(session_id, r["id"])
+    inv = create_investigation(session_id, {"case_id": DEMO_SPEC["case_id"], "title": DEMO_SPEC["title"]})
+    iid = inv["id"]
+    run_trends_for(session_id, iid)
+    r0 = inv["current_revision_id"]
+    update_view(session_id, iid, {"view": {"imagery_date": DEMO_SPEC["imagery_date"], "imagery_date_b": DEMO_SPEC["imagery_date_b"],
+                                           "imagery_mix": 0, "layers": {**inv["config"]["view"]["layers"], "imagery": True},
+                                           "inspector_tab": "leads"}})
+    inv = add_revision(session_id, iid, dict(DEMO_SPEC["assumption"]))
+    return update_view(session_id, iid, {"view": {"last_change": {"from": r0, "to": inv["current_revision_id"]}}})
+
+
 def latest_public_findings(place_id: str, period: dict) -> list[dict]:
     """Findings for a seed place: newest method version, newest ingestion per variable (older ones stay in the graph)."""
     from .config import TREND_METHOD_VERSION

@@ -68,16 +68,24 @@ export default function App() {
   const refreshList = async () => { const l = await api.get<any[]>('/api/investigations'); setInvList(l); return l }
 
   // ------------------------------------------------ investigation lifecycle
+  // Canonical selection: every async result is tagged with the investigation it belongs to and dropped if the
+  // user has since switched, so no panel can silently show a different investigation than the focus bar.
+  const activeInv = useRef<string | null>(null)
+  const isActive = (id: string) => activeInv.current === id
   const loadResults = useCallback(async (id: string) => {
     const r = await api.get<Results>(`/api/investigations/${id}/results`)
+    if (activeInv.current !== id) return r
     setResults(r)
     if (r.batch && !selVar) setSelVar(r.batch.results[0]?.variable || null)
     return r
   }, [selVar])
 
   const openInv = async (id: string, fly = true) => {
+    activeInv.current = id
+    setResults(null); setMatch(null); setChange(null)
     try {
       const i = await api.get<Investigation>(`/api/investigations/${id}`)
+      if (!isActive(id)) return
       setInv(i); setPreview(null); setMatch(null); setAcqEvents([]); setFocus(null)
       setNodeId(i.config.view.selected_node || null); setTrail(i.config.view.evidence_trail || [])
       setSelVar(i.config.view.selected_variable || null)
@@ -87,7 +95,8 @@ export default function App() {
       if (fly) setFlyKey(id + Date.now())
       setChange(null)
       const r = await loadResults(id)
-      if (r.batch) api.get<MatchRun>(`/api/investigations/${id}/match`).then(setMatch).catch(() => {})
+      if (!isActive(id)) return
+      if (r.batch) api.get<MatchRun>(`/api/investigations/${id}/match`).then(m => isActive(id) && setMatch(m)).catch(() => {})
       const lc = i.config.view.last_change
       if (lc && i.revisions.some(x => x.id === lc.from) && lc.to === i.current_revision_id) loadChange(id, lc.from, lc.to)
     } catch (e) { fail(e) }
@@ -105,6 +114,7 @@ export default function App() {
   const switchTab = (t: Tab) => { setTab(t); if (inv) patchView({ inspector_tab: t }) }
 
   const openCase = async (c: CaseFile) => {
+    activeInv.current = null
     const full = await api.get<CaseFile>(`/api/cases/${c.id}`)
     setPreview(full); setInv(null); setResults(null); setMatch(null); setTab('case'); setFlyKey(c.id + Date.now())
     history.replaceState(null, '', location.pathname)
@@ -147,7 +157,12 @@ export default function App() {
   }
   const [change, setChange] = useState<any>(null)
   const loadChange = async (id: string, from: string, to: string) => {
-    try { setChange(await api.get(`/api/investigations/${id}/what-changed?frm=${from}&to=${to}`)) } catch { setChange(null) }
+    try { const d = await api.get(`/api/investigations/${id}/what-changed?frm=${from}&to=${to}`); if (isActive(id)) setChange(d) } catch { setChange(null) }
+  }
+  const openDemo = async () => {
+    setBusy('open')
+    try { const i = await api.post<Investigation>('/api/demo'); await refreshList(); await openInv(i.id); say('Demo investigation ready: Camp Fire 2018 with two real imagery dates and one labelled planning assumption.') }
+    catch (e) { fail(e) } finally { setBusy(null) }
   }
   const revise = async (body: any) => {
     if (!inv) return
@@ -199,11 +214,23 @@ export default function App() {
   const imageryDateB = inv?.config.view.imagery_date_b ?? null
   const imageryMix = inv?.config.view.imagery_mix ?? 0
   const today = new Date().toISOString().slice(0, 10)
+  // The one canonical focus every panel reads from.
+  const focusState = inv ? {
+    investigation: inv.id,
+    revision: inv.current_revision_id,
+    revisionSeq: inv.revisions.find(r => r.id === inv.current_revision_id)?.seq,
+    claim: nodeId,
+    observation: imageryDateB && imageryMix >= 0.5 ? imageryDateB : imageryDate,
+    observationLabel: imageryDateB ? (imageryMix >= 0.5 ? 'B' : 'A') : null,
+    graph: match?.graph_version ?? null,
+    matchRun: match?.id ?? null,
+  } : null
   const defaultDateB = (a: string | null) => { if (!a) return null; const d = new Date(a + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() - 14); return d.toISOString().slice(0, 10) }
   const hasResults = !!results?.batch
   const exportsDisabled = !inv ? 'Open an investigation first' : !hasResults ? 'Acquire NASA data first' : null
 
   const cmds: Cmd[] = useMemo(() => [
+    { id: 'demo', label: 'Open demo investigation (Camp Fire 2018)', run: () => openDemo() },
     { id: 'new', label: 'Investigate another place…', run: () => setNewPlace(true) },
     ...cases.map(c => ({ id: 'case-' + c.id, label: `Open case file: ${c.display_name}`, run: () => openCase(c) })),
     ...invList.map(i => ({ id: 'inv-' + i.id, label: `Open investigation: ${i.title}`, run: () => openInv(i.id) })),
@@ -392,14 +419,18 @@ export default function App() {
               <h3>Start an investigation</h3>
               <p>Each case file opens its location, event, documented responses and original sources. NASA trend findings are computed only when you acquire data.</p>
               {meta && <p className="small muted">{meta.catalog_counts.entries} catalog entries · {meta.catalog_counts.analysis_ready_adapters} numerical adapter (NASA POWER) · {meta.catalog_counts.imagery_adapters} imagery layer (GIBS) · copilot: {meta.llm.available ? meta.llm.model : 'Guided analysis (no model key)'}</p>}
-              <button className="btn primary" onClick={() => setNewPlace(true)}>Investigate another place</button>
+              <div className="row wrap">
+                <button className="btn primary" onClick={openDemo} disabled={busy === 'open'}>{busy === 'open' ? 'Preparing…' : 'Open demo investigation'}</button>
+                <button className="btn" onClick={() => setNewPlace(true)}>Investigate another place</button>
+              </div>
+              <p className="small muted">Demo: Camp Fire 2018 — real NASA trends, MODIS 2018-11-08 vs 2018-10-25, one labelled planning assumption that changes a planning lead.</p>
             </div>
           )}
           {tab === 'case' && caseOf && <CasePanel c={caseOf} busy={busy === 'open'} onOpen={() => inv ? switchTab('analysis') : createFromCase(caseOf)} onNode={id => inv ? showNode(id) : say('Open the investigation to inspect graph evidence.')} />}
           {inv && meta && tab === 'analysis' && <AnalysisPanel inv={inv} results={results} busy={busy === 'acquire'} onAcquire={acquire} selectedVar={selVar} onSelectVar={v => { setSelVar(v); patchView({ selected_variable: v }) }} onNode={showNode} acqEvents={acqEvents} />}
           {inv && meta && tab === 'leads' && <LeadsPanel inv={inv} meta={meta} match={match} busy={busy === 'match'} onRun={runMatch} onTrace={trace} onNode={id => showNode(id)} onRevise={revise} hasResults={hasResults}
             change={change} onDismissChange={() => { setChange(null); patchView({ last_change: null }) }} />}
-          {inv && meta && tab === 'copilot' && <CopilotPanel invId={inv.id} meta={meta} onNode={showNode} onTab={t => switchTab(t as Tab)} />}
+          {inv && meta && tab === 'copilot' && <CopilotPanel key={inv.id} invId={inv.id} meta={meta} onNode={showNode} onTab={t => switchTab(t as Tab)} />}
           {inv && tab === 'evidence' && <EvidencePanel nodeId={nodeId} onNode={id => showNode(id)} disputed={inv.state.disputed} onFocusFinding={focusFinding}
             trail={trail} onTrail={id => showNode(id, true)}
             onDispute={(id, on) => { const why = window.prompt(on ? 'Why is this claim disputed?' : 'Why remove the dispute?'); if (why) revise({ kind: on ? 'dispute' : 'undispute', node_id: id, rationale: why }) }} />}
@@ -407,7 +438,15 @@ export default function App() {
         </div>
         <footer className="small muted" style={{ borderTop: '1px solid var(--line)', padding: '6px 12px' }} role="status" aria-live="polite">
           {busy ? <span className="row"><span className="spinner" />{busy === 'acquire' ? 'Acquiring / analysing…' : busy === 'match' ? 'Evaluating precedents…' : 'Working…'}</span>
-            : health === 'ok' ? <>Server ok{inv ? <> · revision R{inv.revisions.find(r => r.id === inv.current_revision_id)?.seq} · {inv.id}</> : ''}</> : health === 'down' ? 'Server unreachable' : 'Connecting…'}
+            : health === 'down' ? 'Server unreachable' : focusState ? (
+              <span className="focusbar" data-testid="focus-bar" title="Canonical focus shared by all panels">
+                <span><b>{focusState.investigation}</b></span>
+                <span>R{focusState.revisionSeq}</span>
+                {focusState.observation && layers.imagery && <span>obs {focusState.observationLabel ? `${focusState.observationLabel} ` : ''}{focusState.observation}</span>}
+                {focusState.claim && <button className="cite" onClick={() => showNode(focusState.claim!)} title="Selected claim">{focusState.claim.length > 22 ? focusState.claim.slice(0, 22) + '…' : focusState.claim}</button>}
+                {focusState.graph && <span>graph {focusState.graph}</span>}
+              </span>
+            ) : health === 'ok' ? 'Server ok' : 'Connecting…'}
         </footer>
       </aside>
 

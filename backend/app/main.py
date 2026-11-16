@@ -118,6 +118,12 @@ async def inv_create(request: Request):
     return services.create_investigation(sid(request), await request.json())
 
 
+@app.post("/api/demo")
+def demo(request: Request):
+    """Canonical demonstration investigation, reproduced in the caller's own session (isolation preserved)."""
+    return services.create_demo_investigation(sid(request))
+
+
 @app.get("/api/investigations/{iid}")
 def inv_get(iid: str, request: Request):
     return services.get_investigation(sid(request), iid)

@@ -269,3 +269,6 @@ details.events > summary { list-style: none; }
 .tn.chg { box-shadow: 0 0 0 3px var(--amber); }
 
 .mapwrap > .map-legend { bottom: 40px; }
+
+.focusbar { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-variant-numeric: tabular-nums; }
+.focusbar b { color: var(--text-2); font-weight: 500; }
