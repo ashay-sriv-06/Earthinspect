@@ -9,7 +9,7 @@ interface Trace { intervention_id: string; investigation_id: string; evaluation:
 
 const LAYER_TITLES = ['Sources & datasets', 'Artifacts & events', 'Analyses', 'Findings & assumptions', 'Mechanism & requirements', 'Response', 'Target investigation']
 
-export default function TraceView({ invId, interventionId, onClose, onNode, onFocusFinding, changed = [] }: { invId: string; interventionId: string; onClose: () => void; onNode: (id: string) => void; onFocusFinding: (n: GNode) => void; changed?: string[] }) {
+export default function TraceView({ invId, interventionId, onClose, onNode, onFocusFinding, changed = [], initialSel, onSelectClaim }: { invId: string; interventionId: string; onClose: () => void; onNode: (id: string) => void; onFocusFinding: (n: GNode) => void; changed?: string[]; initialSel?: string | null; onSelectClaim?: (id: string) => void }) {
   const [t, setT] = useState<Trace | null>(null)
   const [err, setErr] = useState<string | null>(null)
   const [sel, setSel] = useState<string | null>(null)
@@ -17,7 +17,7 @@ export default function TraceView({ invId, interventionId, onClose, onNode, onFo
   const [view, setView] = useState<'graph' | 'table'>('graph')
   useEffect(() => {
     setT(null); setErr(null)
-    api.get<Trace>(`/api/investigations/${invId}/trace/${encodeURIComponent(interventionId)}`).then(x => { setT(x); setSel(interventionId); setPulse(true); setTimeout(() => setPulse(false), 400) }).catch(e => setErr(e.message))
+    api.get<Trace>(`/api/investigations/${invId}/trace/${encodeURIComponent(interventionId)}`).then(x => { setT(x); setSel(initialSel && x.nodes.some(n => n.id === initialSel) ? initialSel : interventionId); setPulse(true); setTimeout(() => setPulse(false), 400) }).catch(e => setErr(e.message))
   }, [invId, interventionId])
   useEffect(() => { const k = (e: KeyboardEvent) => e.key === 'Escape' && onClose(); window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k) }, [onClose])
 
@@ -63,7 +63,11 @@ export default function TraceView({ invId, interventionId, onClose, onNode, onFo
   }, [t, sel, pulse, changed.join('|')])
 
   const selNode = t?.nodes.find(n => n.id === sel)
-  const pick = (id: string) => { setSel(id); const n = t?.nodes.find(x => x.id === id); if (n?.type === 'Finding' && n.props.kind?.startsWith('trend')) onFocusFinding(n) }
+  const pick = (id: string) => {
+    setSel(id); onSelectClaim?.(id)
+    const n = t?.nodes.find(x => x.id === id)
+    if (n?.type === 'Finding' && n.props.kind?.startsWith('trend')) onFocusFinding(n)
+  }
 
   return (
     <div className="overlay" role="dialog" aria-label="Evidence trace">

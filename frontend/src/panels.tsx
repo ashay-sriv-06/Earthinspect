@@ -204,6 +204,48 @@ function AssocCard({ a }: { a: any }) {
 }
 
 /* ------------------------------------------------------------ leads */
+function ExplainChange({ c, d }: { c: any; d: any }) {
+  const [itv, setItv] = useState<GNode | null>(null)
+  const [src, setSrc] = useState<GNode | null>(null)
+  useEffect(() => {
+    api.get<GNode>(`/api/graph/node/${encodeURIComponent(c.intervention_id)}`).then(n => {
+      setItv(n)
+      if (n.props.source_id) api.get<GNode>(`/api/graph/node/${encodeURIComponent(n.props.source_id)}`).then(setSrc).catch(() => {})
+    }).catch(() => {})
+  }, [c.intervention_id])
+  const decisiveAfter = (c.after_features || []).filter((f: any) => f.kind === 'decisive')
+  const before = Object.fromEntries((c.before_features || []).map((f: any) => [f.feature, f.state]))
+  const stillUnknown = decisiveAfter.filter((f: any) => f.state === 'unknown')
+  const changedReqs = new Set(c.changed_features.map((f: any) => f.feature.replace('requires:', '')))
+  const p = itv?.props
+  // Does an analyst mapping correspond to a prerequisite the source actually lists? (shared content words)
+  const words = (s: string) => new Set((s.toLowerCase().match(/[a-z]{4,}/g) || []).filter(w => !['with', 'that', 'from', 'available', 'defined'].includes(w)))
+  const documented = (why: string) => (p?.prerequisites || []).some((x: string) => { const a = words(why), b = words(x); let n = 0; a.forEach(w => b.has(w) && n++); return n >= 2 })
+  const hinge = (p?.requirements || []).filter((r: any) => changedReqs.has(r.id))
+  const conditional = hinge.some((r: any) => !documented(r.why || ''))
+  return (
+    <details className="explain" open>
+      <summary className="small"><b>Why this changed</b></summary>
+      {conditional && <p className="small cond"><b>Conditional assessment.</b> This change hinges on {hinge.map((r: any) => <code key={r.id}>{r.id}</code>)}, an analyst-added applicability condition that is <b>not among the prerequisites this source lists</b>. Treat the new eligibility as conditional on that judgement, not as a finding of the source.</p>}
+      <div className="small">
+        <p style={{ margin: '4px 0' }}><b>Rule ({d.rule_version}):</b> {c.eligibility.to === 'candidate_lead'
+          ? 'mechanism compatible and every decisive prerequisite satisfied → candidate lead.'
+          : stillUnknown.length ? `still needs local evidence: ${stillUnknown.map((f: any) => f.feature.replace('requires:', '')).join(', ')} remain unknown.` : `eligibility ${c.eligibility.to}.`}</p>
+        <table className="xt"><thead><tr><th>Decisive feature</th><th>Before</th><th>After</th><th>Weight</th></tr></thead>
+          <tbody>{decisiveAfter.map((f: any) => <tr key={f.feature} className={changedReqs.has(f.feature.replace('requires:', '')) ? 'chg' : ''}><td>{f.feature.replace('requires:', '')}</td><td>{before[f.feature] || '—'}</td><td className={`st ${f.state}`}>{f.state}</td><td className="num">{f.weight}</td></tr>)}</tbody></table>
+        {p && <>
+          <p style={{ margin: '6px 0 2px' }}><b>Documented prerequisites</b> <span className="badge b-source">Source-reported</span> — {src?.label || p.source_id}{p.locator ? `, ${p.locator}` : ''}:</p>
+          <ul style={{ margin: 0, paddingLeft: 16 }}>{(p.prerequisites || []).map((x: string) => <li key={x}>“{x}”</li>)}</ul>
+          <p style={{ margin: '6px 0 2px' }}><b>Mapping to generic requirements</b> <span className="badge b-assume">Analyst-authored</span>:</p>
+          <ul style={{ margin: 0, paddingLeft: 16 }}>{(p.requirements || []).map((r: any) => <li key={r.id}>{r.why} → <code>{r.id}</code>{r.decisive ? ' (decisive — analyst judgement)' : ''}
+            {documented(r.why || '') ? <span className="badge b-source" style={{ marginLeft: 4 }}>matches a listed prerequisite</span> : <span className="badge b-assume" style={{ marginLeft: 4 }}>not listed by source</span>}</li>)}</ul>
+          <p className="muted" style={{ margin: '4px 0 0' }}>{p.overlay_note}</p>
+        </>}
+      </div>
+    </details>
+  )
+}
+
 function ChangeBanner({ d, onTrace, onDismiss }: { d: any; onTrace: (id: string) => void; onDismiss?: () => void }) {
   const changed = d.candidates.filter((c: any) => c.changed)
   const title = (id: string | null) => (id && d.candidates.find((c: any) => c.intervention_id === id)?.title) || id || '—'
@@ -213,8 +255,14 @@ function ChangeBanner({ d, onTrace, onDismiss }: { d: any; onTrace: (id: string)
         <h4 style={{ margin: 0 }}>Assessment updated</h4>
         {onDismiss && <button className="btn sm ghost" onClick={onDismiss} aria-label="Dismiss">✕</button>}
       </div>
-      <p className="small" style={{ margin: '4px 0' }}>{d.responsible_revisions.map((r: any) => `R${r.seq} ${humanize(r.kind)} — “${r.rationale}”`).join('; ')}</p>
-      <p className="small" style={{ margin: '4px 0' }}><b>Top lead:</b> {d.top_lead.changed ? <>{title(d.top_lead.from)} → <b>{title(d.top_lead.to)}</b></> : 'unchanged'}</p>
+      {d.responsible_revisions.map((r: any) => (
+        <div key={r.id} className="small" style={{ margin: '4px 0' }}>
+          <b>R{r.seq} {humanize(r.kind)}</b>{r.changes?.requirement_id && <> · <code>{r.changes.requirement_id}</code>: <b>{r.changes.from ? `${r.changes.from.state} (${humanize(r.changes.from.basis)})` : 'unknown (not recorded)'}</b> → <b>{r.changes.to ? `${r.changes.to.state} (${r.changes.to.basis === 'analyst_assumption' ? 'planning assumption — not a sourced fact' : 'linked source ' + r.changes.to.source_id})` : 'unknown'}</b></>}
+          <div className="muted">Assumption text: “{r.rationale}”</div>
+        </div>
+      ))}
+      <p className="small" style={{ margin: '4px 0' }}><b>Highest-ranked lead:</b> {d.top_lead.changed ? <>{title(d.top_lead.from)} → <b>{title(d.top_lead.to)}</b></> : 'unchanged'}</p>
+      <p className="small muted" style={{ margin: '0 0 4px' }}>{d.rules?.ordering} Responses that are separate recommendations in the same source can be complementary.</p>
       {changed.length === 0 && <p className="small muted">No eligibility or feature changed. {d.unchanged_note}</p>}
       {changed.map((c: any) => (
         <div key={c.intervention_id} className="small" style={{ borderTop: '1px solid var(--paper-line)', padding: '4px 0' }}>
@@ -222,6 +270,7 @@ function ChangeBanner({ d, onTrace, onDismiss }: { d: any; onTrace: (id: string)
           <span className={`lead-tag ${c.eligibility.from}`}>{humanize(c.eligibility.from)}</span> → <span className={`lead-tag ${c.eligibility.to}`}>{humanize(c.eligibility.to)}</span>
           <span className="num"> · match {c.match_score.from?.toFixed(2)}→{c.match_score.to?.toFixed(2)} · coverage {c.coverage.from?.toFixed(2)}→{c.coverage.to?.toFixed(2)}</span>
           {c.changed_features.map((f: any) => <div key={f.feature} className="muted">{f.feature.replace('requires:', '')}: {f.from} → <span className={`st ${f.to}`}>{f.to}</span></div>)}
+          {c.after_features && <ExplainChange c={c} d={d} />}
           <button className="btn sm" style={{ marginTop: 4 }} onClick={() => onTrace(c.intervention_id)}>Trace updated lead</button>
         </div>
       ))}
@@ -266,6 +315,13 @@ export function LeadsPanel(p: { inv: Investigation; meta: Meta; match: MatchRun 
       </div>
       {!p.hasResults && <p className="small muted">Tip: acquire NASA data first so environmental context features can be assessed (otherwise they stay unknown).</p>}
       {m && m.insufficient_context && <div className="empty" style={{ marginBottom: 10 }}><h3>Context insufficient</h3><p>The target's hazard mechanism is not established, so no precedent can be judged transferable. Establish it above; every candidate stays “needs local evidence” until then.</p></div>}
+      {p.inv.config.place.case_id && (
+        <div className="sheet retro" role="note">
+          <b className="small">Retrospective analysis.</b> <span className="small">This investigation reconstructs a past event. The documents
+          behind these leads (e.g. post-event investigations and later strategies) and the post-event imagery were not available
+          beforehand; leads show lessons in hindsight, not what was knowable at the time.</span>
+        </div>
+      )}
       {p.change && <ChangeBanner d={p.change} onTrace={p.onTrace} onDismiss={p.onDismissChange} />}
       {m && m.leads.map((e, i) => <LeadCard key={e.intervention_id} e={e} rank={i + 1} onTrace={p.onTrace} onNode={p.onNode} onRevise={p.onRevise} />)}
       {m && m.leads.length === 0 && <div className="empty"><h3>No eligible precedent</h3><p>No documented response passed the contextual rules. See exclusions below for what does not transfer.</p></div>}
@@ -366,7 +422,7 @@ function LeadCard({ e, rank, onTrace, onNode, onRevise }: { e: Evaluation; rank:
 }
 
 /* ------------------------------------------------------------ evidence sheet (any node) */
-export function EvidencePanel({ nodeId, onNode, onDispute, disputed, onFocusFinding, trail = [], onTrail }: { nodeId: string | null; onNode: (id: string) => void; onDispute: (id: string, on: boolean) => void; disputed: string[]; onFocusFinding: (n: GNode) => void; trail?: string[]; onTrail?: (id: string) => void }) {
+export function EvidencePanel({ nodeId, onNode, onDispute, disputed, onFocusFinding, trail = [], onTrail, onShowInGraph }: { nodeId: string | null; onNode: (id: string) => void; onDispute: (id: string, on: boolean) => void; disputed: string[]; onFocusFinding: (n: GNode) => void; trail?: string[]; onTrail?: (id: string) => void; onShowInGraph?: (n: GNode) => void }) {
   const [n, setN] = useState<GNode | null>(null)
   const [prov, setProv] = useState<{ nodes: GNode[]; edges: any[] } | null>(null)
   const [usedBy, setUsedBy] = useState<{ nodes: GNode[]; edges: any[] } | null>(null)
@@ -419,9 +475,13 @@ export function EvidencePanel({ nodeId, onNode, onDispute, disputed, onFocusFind
         {p.locator && n.type !== 'Source' && <p className="small muted">Locator: {p.locator}</p>}
         {p.excerpt && <p className="small muted">“{p.excerpt}”</p>}
         <p className="small muted num">Ingested {n.ingested_at}{n.event_time ? ` · event time ${n.event_time}` : ''}{n.published_time ? ` · published ${n.published_time}` : ''}</p>
-        {(n.type === 'Finding' || n.type === 'Outcome') && (
-          <button className="btn sm" onClick={() => onDispute(n.id, !isDisputed)}>{isDisputed ? 'Remove dispute' : 'Mark claim disputed'}</button>
-        )}
+        <div className="row wrap" style={{ marginTop: 4 }}>
+          {onShowInGraph && ['Finding', 'Intervention', 'Source', 'Requirement', 'Analysis', 'Artifact', 'Outcome'].includes(n.type) &&
+            <button className="btn sm primary" onClick={() => onShowInGraph(n)}>Show in evidence graph</button>}
+          {(n.type === 'Finding' || n.type === 'Outcome') && (
+            <button className="btn sm" onClick={() => onDispute(n.id, !isDisputed)}>{isDisputed ? 'Remove dispute' : 'Mark claim disputed'}</button>
+          )}
+        </div>
       </div>
       {prov && prov.edges.length > 0 && (
         <div className="sheet">

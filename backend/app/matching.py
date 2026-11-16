@@ -273,6 +273,9 @@ def what_changed(session_id: str, iid: str, from_rid: str, to_rid: str) -> dict:
                 changed_feats.append({"feature": f["feature"], "from": fa.get(f["feature"], {}).get("state"),
                                       "to": f["state"], "detail": f["detail"]})
         diffs.append({
+            "after_features": [{k: f[k] for k in ("feature", "state", "kind", "weight", "detail")} for f in (eb or {}).get("features", [])],
+            "before_features": [{k: f[k] for k in ("feature", "state", "kind", "weight")} for f in (ea or {}).get("features", [])],
+            "source_id": (eb or ea).get("source_id"), "locator": (eb or ea).get("locator"),
             "intervention_id": iv, "title": (eb or ea)["title"], "source_place": (eb or ea)["source_place"],
             "eligibility": {"from": ea and ea["eligibility"], "to": eb and eb["eligibility"]},
             "match_score": {"from": ea and ea["match_score"], "to": eb and eb["match_score"]},
@@ -296,4 +299,17 @@ def what_changed(session_id: str, iid: str, from_rid: str, to_rid: str) -> dict:
         "unchanged_note": None if top_a != top_b else
         "The top lead did not change. Remaining unknowns: " + "; ".join(b["leads"][0]["next_evidence"] if b["leads"] else []),
         "artifacts_reused": "Revisions do not change acquisition inputs; NASA artifacts and trend analyses are reused unchanged.",
+        "rule_version": MATCH_RULE_VERSION,
+        "rules": {
+            "eligibility": [
+                "excluded: different hazard family, or a decisive prerequisite recorded as not satisfied",
+                "partial_component_only: same hazard family, different mechanism",
+                "needs_local_evidence: any decisive prerequisite (or the mechanism) still unknown",
+                "candidate_lead: mechanism compatible and every decisive prerequisite satisfied",
+            ],
+            "ordering": "Leads are ordered by eligibility (candidate → needs evidence → partial), then ordinal match "
+                        "score, then coverage. Ordering reflects evidence completeness for this target; it does not "
+                        "mean one response replaces another.",
+            "weights": {"mechanism": W_MECH, "prerequisite": W_REQ, "scale": W_SCALE, "climate_signal": W_SIGNAL},
+        },
     }

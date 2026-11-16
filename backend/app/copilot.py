@@ -187,7 +187,10 @@ def t_evaluate_transfer(run):
                 "mismatches": [m["detail"] for m in e["mismatches"]][:4],
                 "unknowns": [u["detail"] for u in e["unknowns"] if u["kind"] != "context"][:4],
                 "next_evidence": e["next_evidence"][:3], "conflicts": [c["id"] for c in e["conflicts"]][:3]}
-    return {"match_run_id": res["id"], "graph_version": res["graph_version"],
+    reqs = res["context"].get("requirements", {})
+    return {"match_run_id": res["id"], "graph_version": res["graph_version"], "revision_id": res["revision_id"],
+            "assumptions_in_effect": [{"requirement_id": k, "state": v["state"], "basis": v["basis"], "node_id": v.get("via"),
+                                       "rationale": v.get("note")} for k, v in reqs.items()],
             "insufficient_context": res["insufficient_context"],
             "leads": [slim(e) for e in res["leads"]], "excluded": [slim(e) for e in res["excluded"]][:4]}
 
@@ -356,6 +359,15 @@ def guided(run, question: str) -> dict:
     if want_precedent:
         pr = call_tool(run, "retrieve_precedents", {})
         ev = call_tool(run, "evaluate_transfer", {})
+        for a in ev["assumptions_in_effect"]:
+            label = "planning assumption (not a sourced fact)" if a["basis"] == "analyst_assumption" else "linked source"
+            ans["mismatches_unknowns"].append({
+                "text": f"In effect at revision {ev['revision_id']}: {a['requirement_id']} = {a['state']} — {label}. "
+                        f"Leads that depend on it are conditional on this input.",
+                "cites": [x for x in (a["node_id"],) if x]})
+        if inv["config"]["place"].get("case_id"):
+            ans["mismatches_unknowns"].append({"text": "Retrospective case: the documents and imagery behind these leads date from "
+                                                       "after the event and were not available beforehand.", "cites": []})
         if ev["insufficient_context"]:
             ans["mismatches_unknowns"].append({"text": "The target hazard mechanism is not established, so no precedent can be judged transferable yet.", "cites": []})
         for lead in ev["leads"]:

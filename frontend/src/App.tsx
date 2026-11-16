@@ -429,7 +429,8 @@ export default function App() {
             <p style={{ margin: '6px 0 0' }}>Open one of four source-backed case files on the left, or investigate a new place with the same NASA data and evidence pipeline.</p>
           </div>
         )}
-        {traceId && inv && <TraceView key={traceId + inv.current_revision_id} invId={inv.id} interventionId={traceId} changed={changedNodes} onClose={closeTrace} onNode={id => { closeTrace(); showNode(id) }} onFocusFinding={focusFinding} />}
+        {traceId && inv && <TraceView key={traceId + inv.current_revision_id} invId={inv.id} interventionId={traceId} changed={changedNodes} initialSel={nodeId}
+          onSelectClaim={id => { setNodeId(id); setTrail(t => [...t.filter(x => x !== id), id].slice(-10)); patchView({ selected_node: id }) }} onClose={closeTrace} onNode={id => { closeTrace(); showNode(id) }} onFocusFinding={focusFinding} />}
         {compare && <CompareView cases={cases} invs={invList} initialA={inv ? (inv.config.place.case_id ? `case:${inv.config.place.case_id}` : `inv:${inv.id}`) : `case:${cases[0]?.id}`} onClose={() => setCompare(false)} />}
       </main>
 
@@ -470,6 +471,11 @@ export default function App() {
           {inv && meta && tab === 'copilot' && <CopilotPanel key={inv.id} invId={inv.id} meta={meta} onNode={showNode} onTab={t => switchTab(t as Tab)} />}
           {inv && tab === 'evidence' && <EvidencePanel nodeId={nodeId} onNode={id => showNode(id)} disputed={inv.state.disputed} onFocusFinding={focusFinding}
             trail={trail} onTrail={id => showNode(id, true)}
+            onShowInGraph={n => {
+              const v = n.props?.variable
+              const lead = match?.leads.find(l => l.features.some(f => f.feature === `signal:${v}` || f.evidence.includes(n.id))) || match?.leads.find(l => l.intervention_id === n.id) || match?.leads[0]
+              if (lead) trace(n.type === 'Intervention' ? n.id : lead.intervention_id); else say('Find precedents first (Leads tab) to build an evidence graph.', true)
+            }}
             onDispute={(id, on) => { const why = window.prompt(on ? 'Why is this claim disputed?' : 'Why remove the dispute?'); if (why) revise({ kind: on ? 'dispute' : 'undispute', node_id: id, rationale: why }) }} />}
           {inv && meta && tab === 'changes' && <ChangesPanel inv={inv} meta={meta} onRevise={revise} onActivate={activate} match={match} onNode={showNode} />}
         </div>
