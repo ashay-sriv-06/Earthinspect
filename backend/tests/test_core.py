@@ -99,6 +99,23 @@ def test_cache_keys_distinguish_inputs():
     assert a != power.request_spec("PRECTOTCORR", g, 2001, 2024)["cache_key"]
 
 
+def test_analysis_cache_key_tracks_method_version(monkeypatch):
+    k1 = an.analysis_cache_key("trend_batch", ["a", "b"], {"start": "2001-01"})
+    assert k1 == an.analysis_cache_key("trend_batch", ["b", "a"], {"start": "2001-01"})
+    assert k1 != an.analysis_cache_key("trend_batch", ["a", "b"], {"start": "2002-01"})
+    monkeypatch.setattr(an, "TREND_METHOD_VERSION", "trend-test-9.9")
+    assert k1 != an.analysis_cache_key("trend_batch", ["a", "b"], {"start": "2001-01"})  # method change invalidates
+
+
+def test_bh_controls_significance_wording():
+    res = [an.trend(synth(seed=s, slope_per_year=sl), "2001-01", "2024-12", "u", f"V{s}") for s, sl in ((1, 0.05), (2, 0.0), (3, 0.0), (4, 0.0))]
+    res = an.bh_adjust(res)
+    for r in res:
+        assert r["significant_bh"] == (r["q_value"] < 0.05)
+        if r["significant_at_0_05"] and not r["significant_bh"]:
+            assert "not after Benjamini" in r["statement"]
+
+
 def test_geometry_validation():
     with pytest.raises(ApiError) as e:
         canonical({"type": "bbox", "west": 170, "south": 0, "east": -170, "north": 5})

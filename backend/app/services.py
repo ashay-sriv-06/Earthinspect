@@ -104,6 +104,21 @@ def _scope_for(place: dict, session_id: str) -> str:
     return "public" if place.get("case_id") else session_id
 
 
+def run_trends_for(session_id: str, iid: str, variables: list[str] | None = None, force_refresh: bool = False,
+                   on_event=None) -> dict:
+    """Run the trend family for an investigation and pin it as the investigation's current analysis batch."""
+    inv = get_investigation(session_id, iid)
+    cfg = inv["config"]
+    batch = run_trends(cfg["place"], variables or cfg["variables"], cfg["period"]["start"], cfg["period"]["end"],
+                       session_id, force_refresh=force_refresh, on_event=on_event)
+    with db.tx() as c:
+        r = c.execute("SELECT config_json FROM investigations WHERE id=? AND session_id=?", (iid, session_id)).fetchone()
+        cfg2 = db.loads(r["config_json"])
+        cfg2["current_batch"] = batch["id"]
+        c.execute("UPDATE investigations SET config_json=?, updated_at=? WHERE id=?", (db.dumps(cfg2), db.now_iso(), iid))
+    return batch
+
+
 def run_trends(place: dict, variables: list[str], start: str, end: str, session_id: str,
                force_refresh: bool = False, on_event=None) -> dict:
     """Acquire each variable, run the prespecified trend family with BH adjustment, persist analyses and
@@ -222,7 +237,8 @@ def ingest_trend_batch(place: dict, batch: dict, acquisitions: list[dict], sessi
                 props = {"kind": "trend", "variable": v, "units": r["units"],
                          "slope_per_decade": r["slope_per_decade"], "ci95_per_decade": r["ci95_per_decade"],
                          "p_value": r["p_value"], "q_value": r.get("q_value"),
-                         "significant": r["significant_at_0_05"],
+                         "significant": r.get("significant_bh", r["significant_at_0_05"]),
+                         "significance_basis": "Benjamini–Hochberg q < 0.05 across the variable family",
                          "direction": "increase" if r["slope_per_decade"] > 0 else "decrease"}
             else:
                 label = f"{v}: descriptive only — {r['limitation']}"
@@ -476,11 +492,29 @@ def revision_state(session_id: str, iid: str, rid: str) -> dict:
 def latest_findings(session_id: str, iid: str) -> list[dict]:
     """Trend findings for this investigation's place and configured period."""
     inv = get_investigation(session_id, iid)
+    batch = inv["config"].get("current_batch")
+    if not batch:
+        return []
     place_id = inv["config"]["place"]["node_id"]
-    period = inv["config"]["period"]
     with db.conn() as c:
         edges = graph.out_edges(c, place_id, session_id, ["HAS_FINDING"])
         nodes = graph.nodes_by_ids(c, [e["dst"] for e in edges], session_id)
     out = [n for n in nodes.values() if n["props"].get("kind", "").startswith("trend")
-           and n["props"].get("period") == period]
+           and str(n["props"].get("analysis_id", "")).startswith(batch + "-")]
     return sorted(out, key=lambda n: n["props"]["variable"])
+
+
+def latest_public_findings(place_id: str, period: dict) -> list[dict]:
+    """Findings for a seed place: newest method version, newest ingestion per variable (older ones stay in the graph)."""
+    from .config import TREND_METHOD_VERSION
+    with db.conn() as c:
+        edges = graph.out_edges(c, place_id, None, ["HAS_FINDING"])
+        nodes = graph.nodes_by_ids(c, [e["dst"] for e in edges], None)
+    best: dict[str, dict] = {}
+    for n in nodes.values():
+        p = n["props"]
+        if not p.get("kind", "").startswith("trend") or p.get("period") != period or p.get("method_version") != TREND_METHOD_VERSION:
+            continue
+        if p["variable"] not in best or n["ingested_at"] > best[p["variable"]]["ingested_at"]:
+            best[p["variable"]] = n
+    return [best[k] for k in sorted(best)]

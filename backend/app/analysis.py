@@ -200,8 +200,20 @@ def bh_adjust(results: list[dict]) -> list[dict]:
         ps = [results[i]["p_value"] for i in idx]
         _, q, _, _ = multipletests(ps, alpha=0.05, method="fdr_bh")
         for i, qv in zip(idx, q):
-            results[i]["q_value"] = float(qv)
-            results[i]["family"] = {
+            r = results[i]
+            r["q_value"] = float(qv)
+            r["significant_bh"] = bool(qv < 0.05)
+            u = r["units"]
+            lo, hi = r["ci95_per_decade"]
+            if r["significant_bh"]:
+                r["statement"] = (f"Statistically detectable linear {'increase' if r['slope_per_decade'] > 0 else 'decrease'} "
+                                  f"under this method after Benjamini–Hochberg adjustment: {r['slope_per_decade']:+.3f} {u} per decade "
+                                  f"(95% CI {lo:+.3f} to {hi:+.3f}; q = {qv:.4f}).")
+            elif r["significant_at_0_05"]:
+                r["statement"] = (f"Nominally significant (raw p = {r['p_value']:.3f}) but not after Benjamini–Hochberg adjustment "
+                                  f"across the family (q = {qv:.3f}): estimate {r['slope_per_decade']:+.3f} {u} per decade "
+                                  f"(95% CI {lo:+.3f} to {hi:+.3f}). Treat as no statistically detectable linear trend under this method.")
+            r["family"] = {
                 "size": len(results),
                 "tested": len(idx),
                 "adjustment": "Benjamini–Hochberg FDR",
@@ -277,5 +289,5 @@ def associate(x_rows, y_rows, start, end, x_var, y_var, max_lag: int = 3) -> dic
 
 def analysis_cache_key(kind: str, artifact_ids: list[str], params: dict) -> str:
     material = {"kind": kind, "artifacts": sorted(artifact_ids), "params": params,
-                "method": TREND_METHOD_VERSION if kind == "trend" else ASSOC_METHOD_VERSION}
+                "method": TREND_METHOD_VERSION if kind.startswith("trend") else ASSOC_METHOD_VERSION}
     return hashlib.sha256(db.dumps(material).encode()).hexdigest()[:24]

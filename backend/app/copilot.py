@@ -90,13 +90,11 @@ def t_inspect_availability(run, variable: str):
 def _trends(run, variables):
     inv = _inv(run)
     variables = [v for v in (variables or inv["config"]["variables"]) if v in power.SUPPORTED_VARIABLES][:4]
-    place = inv["config"]["place"]
-    period = inv["config"]["period"]
 
     def on_event(typ, label, payload, dur=None):
         run.check()
         run.event(typ, label, payload, dur)
-    return services.run_trends(place, variables, period["start"], period["end"], run.session_id, on_event=on_event)
+    return services.run_trends_for(run.session_id, run.iid, variables or None, on_event=on_event)
 
 
 def t_acquire_series(run, variables: list[str] | None = None):

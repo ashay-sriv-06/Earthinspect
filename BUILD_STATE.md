@@ -1,4 +1,4 @@
-# BUILD_STATE
+﻿# BUILD_STATE
 
 Start: 2026-11-15 18:35 PST. User deadline: 23:15 PST (5 h). Budget scaled from 450 to ~280 min with the pack's cut order. Elapsed at checkpoint: ~50 min of wall clock (environment setup included Python, Node and Git installs via winget).
 
@@ -9,7 +9,7 @@ Start: 2026-11-15 18:35 PST. User deadline: 23:15 PST (5 h). Budget scaled from 
 | 03 | Four case files | ✅ | `data/cases.json`: 13 sources (10 verified, 3 marked unavailable), 29 event facts and 12 responses, all with locators. |
 | 04 | NASA catalog | ✅ | 16 entries (13 CMR-verified IDs). Status-aware UI. Live CMR search. 1 numerical and 1 imagery adapter, counted separately. |
 | 05 | Acquisition & caching | ✅ | Real regional POWER artifacts, SHA-256, manifests, versioned force refresh, per-key locks, snapshot fallback, cache states shown in UI. |
-| 06 | Trend & association | ✅ | OLS + HAC(12), sensitivity at 24 lags, BH, ≥120-month rule, anomalies, residual correlations. 10 numerical tests. |
+| 06 | Trend & association | ✅ | OLS + HAC(12), sensitivity at 24 lags, BH (significance judged on q; method v1.1), ≥120-month rule, anomalies, residual correlations. 10 numerical tests. |
 | 07 | Geospatial workspace | ✅ | MapLibre with GIBS basemap and imagery (date control and availability check), footprint and grid-cell layers, brush → Apply window, persisted view. |
 | 08 | Evidence graph & bundles | ✅ | Typed nodes and edges, bundles with roles, provenance table, idempotent ingestion, bounded traversals. |
 | 09 | Solutions graph | ✅ | 12 interventions: implemented vs proposed vs retrospective, observed vs projected, limitations as CONTRADICTS. |
@@ -19,7 +19,7 @@ Start: 2026-11-15 18:35 PST. User deadline: 23:15 PST (5 h). Budget scaled from 
 | 13 | Trace evidence | ✅ | Layered React Flow view and table, persisted edges only, mismatch and unknown states, path pulse with reduced motion respected. |
 | 14 | Revisions | ✅ | Immutable revisions, activate prior, "What changed?", assumptions never promoted to sourced facts. |
 | 15 | Compare & export | ✅ | Aligned comparison; CSV, JSON and HTML exports verified. |
-| 16 | Verification | ✅ | VERIFICATION.md: 18 pytest, 31 e2e, provider error, UI flows, 8-question eval. |
+| 16 | Verification | ✅ | VERIFICATION.md: 20 pytest, 31 e2e, provider error, UI flows, 8-question eval. |
 | 17 | Packaging & submission | ⚠️ partial | Dockerfile, README, demo script and submission copy written. **No public deployment** (no credentials). Docker build not run (Docker absent). |
 
 ## Remaining issues / next

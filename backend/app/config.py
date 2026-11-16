@@ -30,7 +30,7 @@ ALLOWED_HOSTS = {
 POWER_START_YEAR = 2001
 POWER_END_YEAR = 2024
 NORMALIZATION_VERSION = "norm-1.0"
-TREND_METHOD_VERSION = "trend-ols-hac-1.0"
+TREND_METHOD_VERSION = "trend-ols-hac-1.1"  # 1.1: significance wording/flags use BH-adjusted q
 ASSOC_METHOD_VERSION = "assoc-1.0"
 MATCH_RULE_VERSION = "match-rules-1.1"
 

@@ -46,7 +46,7 @@ export interface TrendResult {
   baseline: { start: string; end: string; definition: string }
   series: SeriesPt[]; method: any; mode: 'inferential' | 'descriptive'
   slope_per_decade?: number; ci95_per_decade?: [number, number]; se_per_decade?: number
-  p_value?: number; q_value?: number | null; significant_at_0_05?: boolean; statement?: string
+  p_value?: number; q_value?: number | null; significant_at_0_05?: boolean; significant_bh?: boolean; statement?: string
   trend_line?: { date: string; value: number }[]; sensitivity?: any; diagnostics?: any
   limitation?: string; suggested_interval?: { start: string; end: string; months: number } | null; descriptive?: any
   artifact_id: string; artifact_sha256: string; spatial_support: any; cell_centers: [number, number][]; conversions: string[]

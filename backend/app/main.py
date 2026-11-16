@@ -92,11 +92,7 @@ def cases():
 @app.get("/api/cases/{case_id}")
 def case(case_id: str, request: Request):
     c = get_case(case_id)
-    with db.conn() as cn:
-        fids = [e["dst"] for e in graph.out_edges(cn, f"place-{case_id}", None, ["HAS_FINDING"])]
-        findings = list(graph.nodes_by_ids(cn, fids, None).values())
-    c["computed_findings"] = sorted([f for f in findings if f["props"].get("kind", "").startswith("trend")],
-                                    key=lambda f: f["props"]["variable"])
+    c["computed_findings"] = services.latest_public_findings(f"place-{case_id}", services.DEFAULT_PERIOD)
     return c
 
 
@@ -135,12 +131,9 @@ async def inv_patch(iid: str, request: Request):
 @app.post("/api/investigations/{iid}/analyze")
 async def inv_analyze(iid: str, request: Request):
     body = await request.json() if (await request.body()) else {}
-    inv = services.get_investigation(sid(request), iid)
     events = []
-    batch = services.run_trends(inv["config"]["place"], body.get("variables") or inv["config"]["variables"],
-                                inv["config"]["period"]["start"], inv["config"]["period"]["end"], sid(request),
-                                force_refresh=bool(body.get("force_refresh")),
-                                on_event=lambda t, l, p, d=None: events.append({"type": t, "label": l, "payload": p, "duration_ms": d}))
+    batch = services.run_trends_for(sid(request), iid, body.get("variables"), force_refresh=bool(body.get("force_refresh")),
+                                    on_event=lambda t, l, p, d=None: events.append({"type": t, "label": l, "payload": p, "duration_ms": d}))
     batch["events"] = events
     return batch
 
@@ -270,10 +263,8 @@ def _side(ref: str, s: str) -> dict:
     kind, _, ident = ref.partition(":")
     if kind == "case":
         c = get_case(ident)
+        fs = services.latest_public_findings(f"place-{ident}", services.DEFAULT_PERIOD)
         with db.conn() as cn:
-            fids = [e["dst"] for e in graph.out_edges(cn, f"place-{ident}", None, ["HAS_FINDING"])]
-            fs = [f for f in graph.nodes_by_ids(cn, fids, None).values() if f["props"].get("kind", "").startswith("trend")
-                  and f["props"]["period"] == services.DEFAULT_PERIOD]
             itvs = [graph.node_dict(r) for r in cn.execute(
                 "SELECT * FROM nodes WHERE type='Intervention' AND json_extract(props_json,'$.case_id')=?", (ident,)).fetchall()]
         return {"ref": ref, "name": c["display_name"], "mechanism": c["hazard_mechanism"], "scale": c["scale"],

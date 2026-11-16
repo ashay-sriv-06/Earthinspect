@@ -149,7 +149,7 @@ function AcqLog({ events }: { events: any[] }) {
 }
 
 function TrendCard({ r, fid, art, selected, onSelect, onNode }: { r: TrendResult; fid: string; art?: Artifact; selected: boolean; onSelect: () => void; onNode: (id: string) => void }) {
-  const sig = r.significant_at_0_05
+  const sig = r.significant_bh ?? r.significant_at_0_05
   return (
     <div className={`sheet ${selected ? 'selected' : ''}`}>
       <div className="row" style={{ justifyContent: 'space-between' }}>
@@ -164,7 +164,7 @@ function TrendCard({ r, fid, art, selected, onSelect, onNode }: { r: TrendResult
           <p className="small num">95% CI [{fmt(r.ci95_per_decade![0])}, {fmt(r.ci95_per_decade![1])}] · p = {fmtP(r.p_value)} · BH q = {fmtP(r.q_value ?? null)}</p>
           <p className="small">{r.statement}</p>
           <p className="small muted num">HAC 24-lag sensitivity: CI [{fmt(r.sensitivity.ci95_per_decade[0])}, {fmt(r.sensitivity.ci95_per_decade[1])}], p = {fmtP(r.sensitivity.p_value)}</p>
-          {!sig && <p className="small muted">Not significant at 0.05 under this method — shown, not hidden.</p>}
+          {!sig && <p className="small muted">Not significant after family adjustment (BH q ≥ 0.05) — shown, not hidden.</p>}
         </>
       ) : (
         <>

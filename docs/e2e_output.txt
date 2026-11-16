@@ -1,4 +1,4 @@
-﻿PASS health ok, artifacts=20, llm=False
+﻿PASS health ok, artifacts=24, llm=False
 PASS four case files
 PASS copenhagen-2011: every intervention has source locator
 PASS brisbane-2011: every intervention has source locator
@@ -14,7 +14,7 @@ PASS leads: [('int-cph-legislation', 'needs_local_evidence'), ('int-cph-service-
 PASS wildfire responses excluded for pluvial target
 PASS Brisbane response is mechanism mismatch for Copenhagen: partial_component_only
 PASS what-changed: [('int-cph-combined-surface-tunnel', {'from': 'needs_local_evidence', 'to': 'needs_local_evidence'})]
-PASS repeat ingestion idempotent (nodes 181, bundles 16)
+PASS repeat ingestion idempotent (nodes 213, bundles 20)
 PASS revision did not trigger refetch
 PASS prior revision match still inspectable (reused)
 PASS trace node types ['Analysis', 'Artifact', 'Dataset', 'Event', 'Finding', 'Intervention', 'Investigation', 'Mechanism', 'Place', 'Requirement', 'Source'] edges=11
@@ -22,10 +22,10 @@ PASS guided run done with 23 events: ['run_started', 'tool_call', 'tool_result',
 PASS answer findings cited
 PASS llm mode without key -> 409 llm_unavailable
 PASS export csv: 140347 bytes
-PASS export json: 27692 bytes
-PASS export html: 31462 bytes
+PASS export json: 27966 bytes
+PASS export html: 31645 bytes
 PASS export JSON carries graph version + artifact hashes
-PASS new place analysis ana-de3b6c7a93f2 in 0.0s; cache states ['cache_cached', 'cache_cached', 'cache_cached', 'cache_cached']
+PASS new place analysis ana-b8f8d0507559 in 0.1s; cache states ['cache_cached', 'cache_cached', 'cache_cached', 'cache_cached']
 PASS new place leads keep source city: [('Copenhagen 2011', 'needs_local_evidence'), ('Copenhagen 2011', 'needs_local_evidence'), ('Copenhagen 2011', 'needs_local_evidence')]
 PASS repeat new-place request reused cache
 PASS antimeridian rejected
