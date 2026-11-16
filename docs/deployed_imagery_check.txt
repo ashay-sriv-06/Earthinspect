@@ -1,0 +1,17 @@
+﻿PASS swipe divider rendered
+PASS actual observation date labelled on each side
+PASS both real tiles loaded (A=loaded, B=loaded)
+      user-moved camera saved: [-121.8088, 39.9332]
+PASS dragging the divider moves the clip (inset(0px 0px 0px 30%))
+PASS check-for-updates shows real result + timestamp: Newest MODIS date on GIBS: 2026-11-16 · checked 2026-11-16 08:17:47 UTC (manual check; no background monitorin
+PASS server-side tile check confirms both dates
+PASS reopen restores swipe 0.3, date B 2018-10-25, opacity 0.5
+PASS camera preserved through panel changes ([-121.8088, 39.9332])
+PASS reopened map shows the saved swipe position
+PASS server distinguishes missing imagery (missing, HTTP 404)
+PASS changing B reloads real tiles (state loaded)
+FAIL unavailable date B shown as loading, not substituted
+PASS label keeps the requested date (no silent substitution)
+PASS analysis remains usable with failed imagery
+PASS no page errors []
+14/15 passed

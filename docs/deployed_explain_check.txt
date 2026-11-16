@@ -1,0 +1,18 @@
+﻿PASS retrospective notice shown
+PASS exact previous → new value with basis
+PASS exact assumption text recovered
+PASS ranking wording, no replacement claim
+PASS ordering rule + complementarity explained
+PASS exact rule version shown
+PASS documented prerequisites quoted with source
+PASS analyst-authored mappings labelled
+PASS still-unknown decisive prerequisite for evacuation planning visible
+PASS weak analyst-only mapping flagged as conditional
+PASS each mapping marked listed vs not listed by source
+PASS selecting claim find-fe32c12dd125-T2M marks its interval on the chart
+PASS graph opens with the same claim selected
+PASS clicking a source node in the graph updates the canonical claim (inv-a5651afa821c)
+PASS source node shows original-document link
+PASS evidence tab shows the claim selected in the graph
+PASS no page errors []
+17/17 passed

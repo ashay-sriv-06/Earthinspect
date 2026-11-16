@@ -1,0 +1,14 @@
+﻿PASS demo opened; focus bar shows same investigation as URL (inv-401eae587647)
+PASS command bar names the same investigation
+PASS focus bar shows revision R1 (labelled assumption applied)
+PASS focus bar shows observation date A 2018-11-08
+PASS imagery date B = 2018-10-25
+PASS leads show the assessment change produced by the assumption
+PASS focus bar shows graph version from the match run
+PASS flipping imagery updates the canonical observation date
+PASS selected claim in focus bar matches evidence sheet (find-fe32c12dd125-T2M)
+PASS case preview clears investigation focus (no stale investigation shown)
+PASS reload restores the same canonical focus
+PASS POST /api/demo is idempotent per session
+PASS no page errors []
+13/13 passed

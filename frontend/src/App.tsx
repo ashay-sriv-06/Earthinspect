@@ -189,7 +189,9 @@ export default function App() {
     try { const i = await api.post<Investigation>(`/api/investigations/${inv.id}/revisions/${rid}/activate`); setInv(i); setChange(null); patchView({ last_change: null }); setMatch(await api.get<MatchRun>(`/api/investigations/${inv.id}/match`)); say('Switched revision; later revisions are kept.') } catch (e) { fail(e) }
   }
   const [trail, setTrail] = useState<string[]>([])
-  const [imgState, setImgState] = useState<{ A: string; B: string }>({ A: 'loading', B: 'loading' })
+  const [imgStateRaw, setImgState] = useState<{ A: string; B: string }>({ A: 'loading', B: 'loading' })
+  // Server probe verdict for a specific date wins over map tile events for that same date (no race on slow hosts).
+  const [imgProbe, setImgProbe] = useState<{ A?: { date: string; st: string }; B?: { date: string; st: string } }>({})
   const showNode = (id: string, fromTrail = false) => {
     setNodeId(id); setTab('evidence'); setInspOpen(true)
     const next = fromTrail ? trail.slice(0, trail.indexOf(id) + 1) : [...trail.filter(x => x !== id), id].slice(-10)
@@ -215,6 +217,12 @@ export default function App() {
   const imageryDateB = inv?.config.view.imagery_date_b ?? null
   const imageryMix = inv?.config.view.imagery_mix ?? 0
   const today = new Date().toISOString().slice(0, 10)
+  const sideState = (side: 'A' | 'B', d: string | null) => {
+    const pr = imgProbe[side]
+    if (pr && pr.date === d && (pr.st === 'missing' || pr.st === 'error')) return pr.st
+    return imgStateRaw[side]
+  }
+  const imgState = { A: sideState('A', imageryDate), B: sideState('B', imageryDateB) }
   const compareMode: 'swipe' | 'overlay' = inv?.config.view.imagery_compare === 'overlay' ? 'overlay' : 'swipe'
   const imagerySwipe = inv?.config.view.imagery_swipe ?? 0.5
   const latestCheck = inv?.config.view.imagery_latest_check ?? null
@@ -228,8 +236,8 @@ export default function App() {
     const x = Math.floor(((lon + 180) / 360) * n)
     const y = Math.floor(((1 - Math.log(Math.tan((lat * Math.PI) / 180) + 1 / Math.cos((lat * Math.PI) / 180)) / Math.PI) / 2) * n)
     const probe = (side: 'A' | 'B', d: string | null) => d && api.get<any>(`/api/imagery/check?date=${d}&z=${z}&x=${x}&y=${y}`)
-      .then(r => { if (isActive(id) && r.state !== 'available') setImgState(s => ({ ...s, [side]: r.state === 'missing' ? 'missing' : 'error' })) })
-      .catch(() => { if (isActive(id)) setImgState(s => ({ ...s, [side]: 'error' })) })
+      .then(r => { if (isActive(id)) setImgProbe(s => ({ ...s, [side]: { date: d, st: r.state === 'available' ? 'available' : r.state === 'missing' ? 'missing' : 'error' } })) })
+      .catch(() => { if (isActive(id)) setImgProbe(s => ({ ...s, [side]: { date: d, st: 'error' } })) })
     probe('A', imageryDate)
     probe('B', imageryDateB)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -419,7 +427,7 @@ export default function App() {
         <MapView geometry={geometry} support={r0?.spatial_support || null} cellCenters={r0?.cell_centers || []} eventPoint={eventPoint}
           layers={inv ? layers : { ...DEFAULT_LAYERS, grid: false }} imageryDate={imageryDate} imageryDateB={imageryDateB} imageryMix={imageryMix} flyKey={flyKey}
           compareMode={compareMode} swipe={imagerySwipe} onSwipe={v => patchView({ imagery_swipe: +v.toFixed(3) })}
-          onImageryStatus={(side, st) => setImgState(s => (s[side] === st || ((s[side] === 'missing' || s[side] === 'error') && st === 'loaded') ? s : { ...s, [side]: st }))} highlight={highlight}
+          onImageryStatus={(side, st) => setImgState(s => (s[side] === st ? s : { ...s, [side]: st }))} highlight={highlight}
           center={inv?.config.view.center || [10, 20]} zoom={inv?.config.view.zoom || 1.6}
           onView={(c, z) => inv && (c[0] !== inv.config.view.center[0] || c[1] !== inv.config.view.center[1] || z !== inv.config.view.zoom) && patchView({ center: c, zoom: z, camera_saved: true })} />
         {health === 'down' && <div className="map-status" style={{ borderColor: 'var(--red)' }}>Backend unreachable — start the server (see README).</div>}
