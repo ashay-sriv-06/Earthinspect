@@ -1,0 +1,26 @@
+﻿PREP state: Camp Fire 2018 · case file (read-only)
+[   0.0s] 0 case file visible
+[   4.9s] 1 demo investigation open
+   bar: Camp Fire 2018 investigation · 2001-01 – 2024-12 · wui wildfire
+   labels: A · 2018-11-08 | B · 2018-10-25 | states loaded loaded
+[   9.8s] 2 swipe right shows A 2018-11-08
+[  14.6s] 3 swipe left shows B 2018-10-25
+   T2M card: Temperature at 2 Meters T2M | Computed · NASA data | +0.475 | C per decade |  | 95% CI [+0.144, +0.807] · p = 0.0050 · BH q = 0.0099 |  | Statistically detectable linear increase under this method after Benjamini–Hochberg adjustment: +0.475 C per decade (95% CI +0.144 to +0.807; q = 0.0099). |  | HAC 24-lag sensitivity: CI [+0.1
+[  15.8s] 4 T2M finding card
+   leads: ['Collaborative evacuation planning with realistic, repeated training exercises (NIST R-EP 1', 'Resilient, multi-modal emergency notification system that accounts for the time needed to ', 'Pre-planned, distributed wildfire safety zone system (NIST R-TRA 1 to R-TRA 7)']
+[  18.0s] 5 leads with notification card
+[  21.6s] 6 trace open
+   aside: Source | Source-reported | NIST Technical Note 2252: A Case Study of the Camp Fire - NETTRA |  | Open source ↗ · printed page numbers from 'NIST TN 2252 July 2023 <page>' headers |  | Open full evidence sheet | WHY THIS LEAD |  | COMPATIBLE Both concern wildla
+   focus bar: inv-4972a173bd55 | R0 | obs A 2018-11-08 | B 2018-10-25 | src-cf-nist-tn2252 | graph g211.340-3956e0840c
+[  23.1s] 7 NIST source selected
+[  24.7s] 8 inline assumption form
+   banner: ASSESSMENT UPDATED | ✕ | R1 set requirement · req-wui-exposure: unknown (not recorded) → satisfied (planning assumption — not a sourced fact) | Assumption text: “Scenario: the community borders wildland fuels.” |  | Highest-ranked lead: Collaborative evacuation planning with realistic, repeated training exercises (NIST R-EP 1 to R-EP 4) → Resilient, multi-modal emergency notification system that accounts for the time needed to pass information along (NIST R-N 1 to R-N 3) |  | Leads are ordered by eligibility (candidate → needs evidence → partial), then ordinal match score, then coverage. Ordering reflects evidence completeness for this target; it does not mean one response replaces another. 
+[  28.2s] 9 assessment updated banner
+[  28.6s] 10 conditional explanation
+   what changed: WHAT CHANGED? | R0 initial | → active | Compare |  | Responsible: R1 set requirement — “Scenario: the community borders wildland fuels.” |  | Highest-ranked lead: Collaborative evacuation planning with realistic, repeated training exercises (NIST R-EP 1 to R-EP 4) → Resilient, multi-modal emergency notification system that accounts for the time needed to pass information along (NIST R-N 1 to R-N 3) |  | Leads are ordered by eligibility (candidate → needs evidence → partial), then ordinal match s
+[  32.2s] 11 what changed compare
+[  33.1s] 12 export menu
+   report title: Camp Fire 2018 investigation — EarthInspect report
+[  35.1s] 13 report tab
+page errors: []
+TIMELINE [(0.0, '0 case file visible'), (4.9, '1 demo investigation open'), (9.8, '2 swipe right shows A 2018-11-08'), (14.6, '3 swipe left shows B 2018-10-25'), (15.8, '4 T2M finding card'), (18.0, '5 leads with notification card'), (21.6, '6 trace open'), (23.1, '7 NIST source selected'), (24.7, '8 inline assumption form'), (28.2, '9 assessment updated banner'), (28.6, '10 conditional explanation'), (32.2, '11 what changed compare'), (33.1, '12 export menu'), (35.1, '13 report tab')]

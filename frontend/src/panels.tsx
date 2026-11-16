@@ -627,7 +627,10 @@ function WhatChanged({ d, onNode }: { d: any; onNode: (id: string) => void }) {
   return (
     <div className="small" style={{ marginTop: 8 }}>
       <p><b>Responsible:</b> {d.responsible_revisions.map((r: any) => `R${r.seq} ${humanize(r.kind)} — “${r.rationale}”`).join('; ') || '—'}</p>
-      <p><b>Top lead:</b> {d.top_lead.changed ? `changed (${d.top_lead.from} → ${d.top_lead.to})` : 'unchanged'}</p>
+      <p><b>Highest-ranked lead:</b> {d.top_lead.changed
+        ? `${d.candidates.find((c: any) => c.intervention_id === d.top_lead.from)?.title || d.top_lead.from} → ${d.candidates.find((c: any) => c.intervention_id === d.top_lead.to)?.title || d.top_lead.to}`
+        : 'unchanged'}</p>
+      {d.rules?.ordering && <p className="muted">{d.rules.ordering}</p>}
       {d.unchanged_note && <p className="muted">{d.unchanged_note}</p>}
       <p className="muted">{d.artifacts_reused} Match runs: {d.from.match_run} ({d.from.reused ? 'reused' : 'computed'}) → {d.to.match_run} ({d.to.reused ? 'reused' : 'computed'}).</p>
       {changed.length === 0 && <p>No candidate's eligibility or features changed.</p>}
