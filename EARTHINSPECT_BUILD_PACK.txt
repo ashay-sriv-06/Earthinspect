@@ -1,0 +1,443 @@
+EARTHINSPECT
+17 Claude Code build prompts | Disaster investigations, NASA trends, and traceable adaptation precedents
+Prepared 16 November 2026
+
+PRODUCT IN ONE SENTENCE
+EarthInspect helps people investigate environmental change, compare lessons from past disasters, and trace every planning lead back to its contextual assumptions, measured findings, and original sources.
+
+This is a complete build sequence, not an addendum to the earlier heat-focused plan. Use this version as the active specification. Preserve useful existing implementation, but reconcile it to this scope. The challenge brief supplied in the conversation is the governing scope; verify submission logistics separately.
+
+THE FOUR CASE FILES
+1. Copenhagen, July 2011 cloudburst: urban surface-water flooding and the subsequent Cloudburst Management Plan.
+2. Brisbane, January 2011 floods: river and catchment flooding, with official event records and inquiry/response documentation.
+3. Camp Fire, California, November 2018: wildfire, evacuation constraints, and NIST's retrospective investigation.
+4. Cape Town, 2015–2018 water crisis: multiyear drought context, demand management, and the later municipal Water Strategy. Preserve the distinction between the 2015–2017 drought described in that strategy and the broader crisis period.
+
+The two flood cases demonstrate why a shared disaster label is insufficient for transferring an intervention. The wildfire and drought cases test different mechanisms. A fifth, user-selected place must use the same data and analysis pipeline without adding a city-specific code branch.
+
+THE DEMO'S CENTRAL QUESTION
+“What is changing here, which historical experiences are relevant, what makes them transferable or unsuitable, and what additional evidence would change that assessment?”
+
+HOW TO USE THIS PACK
+Save this file at the repository root as EARTHINSPECT_BUILD_PACK.txt. Give Claude Code the launcher below. Execute prompts in order in the same project. After a context reset, have it read CLAUDE.md, BUILD_STATE.md, and this pack. Each numbered block is also independently pasteable after Prompt 1. Do not open 17 competing implementation sessions.
+
+LAUNCHER TO PASTE INTO CLAUDE CODE
+Read EARTHINSPECT_BUILD_PACK.txt completely. Treat its product contract, time budget, and acceptance gates as the active brief. Inspect the existing repository and preserve working code. Execute Prompt 01 now, then continue through Prompts 02–17 in order while updating BUILD_STATE.md. Implement and run the product; do not stop at plans or code snippets. Resolve routine choices yourself. Stop only for an external credential or a decision that actually blocks the next required action, and continue independent work when possible. Use current official documentation for API contracts. Keep every claim grounded in real tool output, acquired data, or a cited source. Report each gate briefly. Cut stretch scope before cutting the core end-to-end workflow. Never claim a deployment, test, model capability, or dataset integration that has not been verified.
+
+TIME BUDGET: 450 MINUTES TOTAL
+These are target caps, not guaranteed estimates. Track actual elapsed time. Preserve the final 60 minutes for verification and delivery. If some of the original 7.5 hours have elapsed, recalculate before starting.
+
+01 Foundation and first running slice             10 min
+02 Visual system and interaction shell            20 min
+03 Historical case evidence                       20 min
+04 NASA catalog and provider contracts            20 min
+05 Real acquisition and persistent caching        35 min
+06 Trend and association analysis                 35 min
+07 Geospatial workspace                          30 min
+08 Evidence graph and typed relationship bundles  25 min
+09 Documented responses and outcomes              25 min
+10 Contextual matching across graphs              25 min
+11 Executable copilot                             35 min
+12 New-place investigation                        30 min
+13 Interactive evidence tracing                   25 min
+14 Evidence revisions and dependency updates      20 min
+15 Case comparison and export                     15 min
+16 Scientific and functional verification         35 min
+17 Deployment, demo, and submission materials      25 min
+Contingency                                       20 min
+
+CHECKPOINTS
+By 2h20: at least one real regional series, chart, slope, uncertainty, and source record run end to end.
+By 4h40: a copilot request creates or reuses an analysis, stores evidence, retrieves precedents, and cites its answer.
+By 6h10: a new place works, the evidence trace is clickable, revisions persist, and a report exports.
+Final hour: freeze feature scope, fix failures, rehearse, and package.
+
+CUT ORDER IF BEHIND
+Cut 3D, animated playback, dual maps, optional daily feeds, additional numerical providers, elaborate graph layout, and extra cosmetic work, in that order. Preserve all four compact source-backed case files, one real numerical data provider, trend statistics, one useful graph query, one real agent workflow, new-place input, source tracing, and persistence. If even these do not fit, disclose the incomplete parts rather than faking them.
+
+GLOBAL BUILD CONTRACT
+• Preserve a viable existing stack. Greenfield default: React + TypeScript + Vite; FastAPI + Python; SQLite plus an artifact directory; MapLibre GL; a chart library; React Flow only for the focused evidence view. Add deck.gl only for a demonstrated layer need. Avoid introducing a separate graph server or orchestration framework during this sprint.
+• Prefer a single deployable container: Python serves the API and built frontend. Use a persistent writable volume for SQLite/artifacts. An ephemeral host must explicitly report its persistence limitation. Do not choose a static-only host for a stateful Python application.
+• Four curated cases are source-backed examples. Generalization means the same acquisition, analysis, provenance, and matching functions accept another valid geography. It does not mean globally validated disaster prediction.
+• The numerical MVP is NASA POWER regional meteorological context. POWER meteorology is model/reanalysis-derived, not a collection of independent satellite instruments. GIBS provides imagery context. Catalog entries for other missions do not imply implemented numerical adapters.
+• The NASA challenge's central output is an interpretable regional time series, estimated rate of change, and explicit statistical uncertainty/significance. A disaster narrative cannot replace this.
+• Separate long-term trends, event observations, documented mechanisms, source-reported outcomes, user scenarios, and hypotheses in the database and UI.
+• The distinctive feature is evidence-aware transfer: show why a precedent is relevant, what does not match, what is unknown, and how new evidence affects the result. Hypergraph bundles preserve multi-factor context. A graph visualization alone is insufficient.
+• Every product button must perform a real action or have a specific disabled reason. No fake activity streams, simulated completed jobs, fabricated statistics, unsupported “AI confidence,” or decorative data.
+• Treat fetched documents as untrusted data. Restrict provider hosts; prevent arbitrary server-side URL access. Validate tool arguments, escape rendered content, keep keys server-side, and isolate mutable user sessions. Never log secrets.
+• Use meaningful deterministic tests for numerical correctness, provenance, invalidation, and isolation. Keep cosmetic iteration visual. Never expose test fixtures as real environmental evidence.
+• Update BUILD_STATE.md after each phase with implemented behavior, acceptance evidence, remaining issues, elapsed time, and next phase. Commit a coherent checkpoint if this is a git repository. Do not modify unrelated work.
+
+======================================================================
+PROMPT 01 — ESTABLISH THE PRODUCT AND RUN THE FIRST SLICE
+Target: 10 minutes
+======================================================================
+
+Act as the implementation owner for EarthInspect. Read the global contract in EARTHINSPECT_BUILD_PACK.txt and inspect the repository, existing app, dependencies, and local instructions. Preserve working architecture. If greenfield, implement the default stack with the fewest moving parts.
+
+Create CLAUDE.md containing the durable product contract, setup commands, data honesty rules, and current module boundaries. Create BUILD_STATE.md with the 17-phase checklist and elapsed-time tracking. Do not spend this phase writing a long architecture essay.
+
+Start the actual frontend and backend. Implement an application shell with a location/case selector, map area, analysis inspector, and status region. Provide a real health endpoint and an investigation create/read endpoint backed by SQLite. The first usable flow is: open app, create an investigation, select Copenhagen, persist its configuration, reload, restore it. Until data acquisition lands, show a truthful empty state with “Acquire NASA data,” not invented charts.
+
+Define shared validated contracts for Investigation, Geometry, DatasetDescriptor, ArtifactRef, AnalysisResult, SourceRecord, GraphRef, and ToolEvent. Keep JSON field names consistent across TypeScript and Python. A numeric result must include units, period, source artifact IDs, method version, and spatial support. Errors use a consistent machine code and user message.
+
+Separate public read-only seed cases from mutable session investigations. Use an opaque session identity or the existing authentication system. Do not expose one user's graph edits or chat through another user's session.
+
+Add an environment example, dependency lockfiles, and a concise README. Verify installed versions rather than guessing compatibility. Keep API keys out of the browser bundle.
+
+Acceptance gate: the application opens, the frontend reaches the backend, and a saved investigation survives a refresh and process restart. Report the run command and the verified behavior. Continue directly to Prompt 02.
+
+======================================================================
+PROMPT 02 — BUILD A DISTINCTIVE, PRECISE VISUAL LANGUAGE
+Target: 20 minutes
+======================================================================
+
+Implement EarthInspect as a geographic investigation instrument. Use kepler.gl's map-first organization, layer controls, temporal filtering, and contextual inspection as interaction references. Use bestdesignsonx.com as a taste reference for carefully composed controls, typography, and microinteractions. Inspect references if browser access is available; otherwise use this specification without claiming visual inspection. Create an original design rather than copying another product's branding or assets.
+
+Choose the “Field Atlas” direction: a dark charcoal map canvas, warm off-white evidence sheets, thin slate dividers, restrained teal for selection, amber for hypotheses, and muted red for conflicts. Keep semantic color consistent and pair it with text or icons. Start with tokens near ink #111820, panel #1B252E, paper #F4F1EA, teal #58C7B1, amber #D5A555; verify contrast before locking them.
+
+Layout at desktop: 48–56px command bar, collapsible 260–280px left layer/case dock, map occupying the remaining center, 340–380px evidence inspector, and a bottom timeline. Opening the copilot replaces an inspector tab rather than adding another floating window. At smaller widths, collapse the left dock and show one active inspection surface. Keep charts and tables usable if WebGL fails.
+
+Use a legible sans serif for controls, tabular numerals for measurements, and optional restrained editorial type only for case-file titles. Use 4/8px spacing, mostly 6–10px radii, compact 32–36px controls, visible focus rings, and generous chart labeling. Avoid a giant landing-page hero, stat-card grids, glass panels, rainbow gradients, oversized pills, and continuously moving decoration.
+
+Implement real component states: default, hover, pressed, focus, loading, selected, disabled, and error. Motion: 120ms button feedback, 160ms segmented selection, 180–220ms inspector transitions, and a single brief path highlight after a trace action. Honor reduced-motion preferences. Preserve focus when opening and closing panels. Tooltips explain rather than repeat labels.
+
+Build the shell with working collapse controls, tabs, keyboard focus, and a command palette containing only implemented actions. Add later features to the palette as they become available.
+
+Acceptance gate: inspect the actual app at 1440×900 and 1280×800. Fix clipping, illegible text, and awkward empty states. Record the design tokens and freeze the visual direction. Further design work must improve an actual workflow.
+
+======================================================================
+PROMPT 03 — CREATE FOUR HISTORICAL CASE FILES WITH REAL EVIDENCE
+Target: 20 minutes
+======================================================================
+
+Build compact, source-backed case manifests for Copenhagen 2011, Brisbane 2011, Camp Fire 2018, and Cape Town's 2015–2018 water crisis. Use the official source starting points in the appendix. Verify documents before extracting facts. Record unavailable sources as unavailable and continue with accessible official material.
+
+For each case store: stable ID, display name, event interval, selected analysis geometry, geometry origin, hazard mechanism, environmental variables worth investigating, source records, a short factual event summary, and two or three documented planning/response lessons. Store event geography separately from the analysis footprint. A city bounding rectangle is not a watershed or a mapped flood boundary.
+
+SourceRecord includes URL, publisher, document title, publication date when known, retrieval date, relevant page/section, a concise claim paraphrase, and verification status. Store short supporting excerpts only where useful, with attribution. Separate event time, publication time, and ingestion time.
+
+The central distinctions must survive into structured data:
+• Copenhagen: intense urban rainfall and surface-water management.
+• Brisbane: regional rainfall/catchment conditions and major river flooding. Do not merge every Queensland flash-flood observation into a Brisbane-city observation.
+• Camp Fire: fire progression and documented life-safety constraints. NIST retrospective lessons are not proof that a proposed intervention was implemented or successful.
+• Cape Town: drought, water-demand response, and later strategy. Do not present the later strategy as if it already existed before the crisis.
+
+Choose geographic bounds using a verified gazetteer, documented boundary, or clearly labeled analyst selection. Add no casualty, financial, or intervention-effect numbers unless the source directly supports them and their geographic/time scope is preserved.
+
+Render the manifests as case-file entries in the app. Each opens its location, event marker, questions to investigate, and original sources. Environmental trend findings remain empty until computed.
+
+Acceptance gate: all four files open, their sources are clickable, and at least one documented lesson per case has a source locator. A reviewer can distinguish event facts, later recommendations, and untested assumptions.
+
+======================================================================
+PROMPT 04 — MAKE NASA DATA DISCOVERABLE WITHOUT FAKING INTEGRATIONS
+Target: 20 minutes
+======================================================================
+
+Implement a searchable dataset catalog that connects a user's question to appropriate variables. Verify official metadata for roughly 12–15 useful product/service entries, within the time cap. Prefer a smaller verified catalog to fabricated completeness.
+
+Cover the relevant families: POWER/MERRA-2 meteorology, GPM IMERG precipitation, MODIS land-surface temperature and vegetation, MODIS burned area, VIIRS/MODIS active fire through FIRMS, SMAP soil moisture, GLDAS land conditions, GRACE/GRACE-FO water storage, Landsat imagery, AIRS atmospheric variables, OMI atmospheric composition, and appropriate terrain/water products. Treat GIBS as an imagery service and Earthdata CMR as discovery infrastructure, not additional independent measurement missions. Verify exact product identifiers and collection versions before writing them into the catalog.
+
+For each entry record variables and definitions, native units, spatial/temporal support, known date coverage, update cadence where documented, provider, source URL, authentication requirements, available access routes, quality caveats, and implemented capability status. Use explicit statuses: metadata only, imagery view, downloadable source, numerical analysis ready. UI actions must respect those statuses.
+
+Implement a provider interface for discovery, availability, fetch, normalize, and provenance. The required numerical adapter is POWER. The required imagery adapter is one verified GIBS layer. Other integrations are stretch scope until those work. Add a small live CMR discovery query only if its contract can be verified quickly; a curated metadata catalog remains valid.
+
+Dataset selection uses hazard mechanism, requested variable, geography, time coverage, spatial scale, and adapter availability. Explain the choice in a sentence: what the variable measures and what it cannot resolve. Searching “flood” should not imply that any rainfall product directly measures inundation.
+
+Acceptance gate: search by flood, fire, drought, or variable; inspect metadata; select a genuinely analyzable variable; see a clear explanation for catalog entries that cannot yet be analyzed. Count catalog entries and working adapters separately.
+
+======================================================================
+PROMPT 05 — ACQUIRE REAL DATA AND MAKE CACHE BEHAVIOR OBSERVABLE
+Target: 35 minutes
+======================================================================
+
+Implement NASA POWER acquisition end to end using current official API documentation. Start with monthly T2M and PRECTOTCORR for a fixed historical window such as 2001–2024, verifying returned definitions and units. Add RH2M and WS10M only after the first two variables work. These provide regional environmental context; do not derive a validated disaster-risk index from them.
+
+Support a documented regional request for a bounded area, respecting provider limits and one-parameter regional constraints where applicable. Preserve returned grid coordinates and spatial resolution. Compute a defensible area-weighted regional aggregate when actual cell support is known. If only a point query can be completed, label it as a nearest-grid-cell series and show its footprint; do not label it a city average. Do not interpolate a coarse grid into street-level detail.
+
+Normalize date order, units, fill values, and response errors. Exclude annual-summary keys from monthly observations. Preserve missing months on the calendar. Distinguish monthly mean precipitation rate from accumulated precipitation; any conversion to monthly totals must use the actual calendar days and be recorded. Keep original data plus a normalized table.
+
+Create immutable artifacts with content hashes and a request manifest: provider, collection/version if supplied, variables, exact geometry or point, period, aggregation, units, quality rules, retrieval time, normalization version, and source URL. Separate acquisition cache keys from analysis cache keys. Identical requests reuse artifacts; changed geometry/period/variable must not collide. A force refresh creates a new version rather than silently overwriting the old evidence.
+
+Use bounded timeouts, limited retries, deduplication of concurrent identical requests, and meaningful errors. Display “Fetched,” “Cached,” or “Saved source snapshot” from actual backend state. A snapshot fallback must be a previously acquired real artifact with its retrieval date. Synthetic fixtures are for tests only.
+
+Prewarm the four cases after the first case succeeds. Add one verified GIBS imagery layer with its own imagery-date control and attribution. Satellite tiles are contextual images, not numerical observations to read by color.
+
+Acceptance gate: save a real regional series, reload it without another provider fetch, change its bounds or period and observe a different artifact key, and handle a provider failure honestly. Record provenance for every displayed value.
+
+======================================================================
+PROMPT 06 — DELIVER THE SCIENTIFIC CORE OF THE CHALLENGE
+Target: 35 minutes
+======================================================================
+
+Build deterministic numerical analysis services independent of the LLM. The default monthly model is an intercept, elapsed time in years, and calendar-month effects. Estimate the linear trend with OLS and heteroskedasticity/autocorrelation-consistent uncertainty using a documented statsmodels implementation. For the MVP, use a predeclared HAC bandwidth of 12 monthly lags and inspect sensitivity at 24. Record all choices. This is an exploratory method, not proof that every time series satisfies its assumptions.
+
+Require at least 120 consecutive valid monthly observations for this inferential path as an explicit product rule, not a universal scientific threshold. If the requested interval has gaps, either ask the user to select a qualifying contiguous interval or return descriptive analysis with a clear limitation. Do not silently compress missing months, zero-fill, or interpolate them for significance testing. Preserve actual elapsed time.
+
+Return slope per decade in the variable's units, 95% confidence interval, p-value, observation count, coverage, period, method/version, uncertainty assumptions, and diagnostics. State “no statistically detectable linear trend under this method” when appropriate, rather than “no change.” For a batch of variables, preserve the full prespecified test family and apply Benjamini–Hochberg adjustment; expose raw p and adjusted q. New exploratory windows start new labeled analyses, not a hunt for the best p-value.
+
+Show raw series, seasonal anomalies with a declared baseline, fitted trend, and method details. Explain confidence intervals as uncertainty about the fitted trend, not future-disaster prediction intervals. Display the actual sign of the result even when it weakens the case narrative.
+
+Add descriptive pairwise associations on aligned overlapping dates. Show both raw correlation and correlation of residuals after removing each variable's fitted trend and seasonal effects. Report overlap and missingness; avoid naive correlation significance claims. Shared model ancestry means these variables are not independent lines of satellite evidence. A lagged association is a hypothesis, not causality or validated forecasting.
+
+Acceptance gate: meaningful synthetic tests recover a known trend with seasonality, reject invalid coverage, preserve calendar spacing, and validate unit conversions. A real case shows its computed slope and interval in the UI with source and method links. Never force a significant result.
+
+======================================================================
+PROMPT 07 — TURN THE MAP INTO A WORKING INVESTIGATION SURFACE
+Target: 30 minutes
+======================================================================
+
+Connect the existing visual shell to real geography, imagery, time series, and analysis. Use MapLibre GL and the existing compatible layer stack. Kepler.gl is the interaction reference; installing the full kepler application is not necessary. Use a documented basemap provider with correct attribution and an honest failure state.
+
+Implement layers for the selected analysis footprint, actual provider grid support where available, verified NASA imagery, and sourced event geometry where available. A point marker should remain a point; do not fabricate a burn perimeter or flood polygon. Include a working layer list with visibility, opacity where meaningful, reorder where supported, legend, date, resolution, and source. Avoid rendering scalar regional aggregates as invented spatial heatmaps.
+
+The bottom strip contains the environmental series, the selected analysis window, and separately labeled event dates. Brushing previews a window; an explicit Apply action recomputes statistics. Imagery date remains distinct from analysis period. Handle absent imagery without substituting a different date silently. Optional playback moves through available images, not interpolated invented frames.
+
+Link map selection, chart focus, and the evidence inspector through stable IDs. Selecting a finding exposes the relevant period and geometry. Selecting an artifact shows acquisition metadata. Maintain camera position through unrelated panel changes. Fly to a new place only after a user action, and honor reduced motion.
+
+Persist selected case, layers, dates, and inspector state with the investigation. A shareable view must not expose mutable session credentials or API keys. Keep a readable chart/table fallback when WebGL or tile loading fails.
+
+If time permits, add a two-case comparison with independently framed maps and aligned chart units. Synchronize camera movement only for two views of the same geography; comparing Denmark with Australia must not move both maps to the same coordinates.
+
+Acceptance gate: changing a layer changes the map; changing the analysis period changes the chart and creates a new analysis; event and imagery dates remain clear; reopening the investigation restores the view. No control is decorative.
+
+======================================================================
+PROMPT 08 — IMPLEMENT THE EVIDENCE GRAPH AND REAL HYPEREDGE STRUCTURE
+Target: 25 minutes
+======================================================================
+
+Implement a persistent typed evidence graph in SQLite using nodes, edges, relationship_bundles, bundle_members, and provenance associations. A separate graph database is unnecessary for this workload. Add schema validation and transactional writes.
+
+Node types should cover Place, Event, Variable, Dataset, Artifact, Analysis, Finding, Source, Intervention, Requirement, Outcome, and Investigation. Use typed directed edges such as DERIVED_FROM, MEASURES, OCCURRED_IN, SUPPORTED_BY, CONTRADICTS, REQUIRES, and SUPERSEDES. Keep names concise and document semantics.
+
+A relationship bundle is a first-class hyperedge with typed member roles. For example, a contextual hypothesis can bind a place, time interval, temperature finding, precipitation finding, proposed mechanism, and supporting publication. Membership alone must not generate causal pairwise edges. A bundle stores its assertion type, evidence status, provenance, time scope, and version. Distinguish measured association from a mechanism described in a source.
+
+Every assertion needs one of: computed finding with artifact/method ancestry; source-reported fact with a locator; explicit analyst assumption; or unverified hypothesis. Preserve event time, source publication time, and ingestion time. Support conflict and supersession without erasing old evidence. Do not attach a made-up probability to an edge.
+
+Implement graph operations the product actually uses: insert an analysis and its provenance; fetch a finding's complete source path; find places with documented shared mechanisms; retrieve interventions whose requirements intersect the target context; retrieve conflicts and unknown prerequisites; and find dependencies of a changed node. Bound traversals and return stable IDs.
+
+Connect completed numerical analyses to graph creation automatically and idempotently. The frontend must read the persisted graph rather than rebuild it from case names.
+
+Acceptance gate: a real analysis becomes graph evidence, a provenance query reaches its immutable artifact and source metadata, repeating ingestion does not duplicate it, and restart preserves the same graph. A multi-member bundle is retrievable with member roles intact.
+
+======================================================================
+PROMPT 09 — BUILD A SOLUTIONS GRAPH THAT PRESERVES WHAT SOURCES ACTUALLY SAY
+Target: 25 minutes
+======================================================================
+
+Add a compact library of documented responses linked to the four case files. Aim for two or three well-supported intervention/lesson records per case. Separate implemented actions, proposed measures, retrospective recommendations, observed outcomes, modeled outcomes, and unresolved limitations.
+
+Each record includes: source city/event; hazard mechanism; intervention category; intended objective; implementation status; prerequisites; scale; time horizon; documented constraints; reported outcome if any; outcome evidence type; source URL/page; and source publication date. Missing cost, effectiveness, or prerequisites remain unknown. Do not fill gaps with plausible-sounding values.
+
+Use Copenhagen's plan for documented surface-water/drainage adaptation, with projected economic/model results labeled as projections. Use Brisbane event/inquiry material for supported planning, warning, or flood-management lessons. Use NIST for Camp Fire observations and recommendations without turning emergency refuge observations into a general safe-routing prescription. Use Cape Town's official strategy for its reported demand response and later resilience commitments, keeping those timelines separate.
+
+Store generic requirements as transferable concepts, while source-specific statements retain their place and period. An intervention can have supporting and conflicting evidence. A reported outcome must remain attached to its original setting; its effect size must never be copied to a target city as a forecast.
+
+Build a response inspector showing “What was done or recommended,” “What the source reports,” “Conditions it depends on,” and “What we do not know.” Provide original-source links and short definitions for non-expert users. Make this a useful evidence sheet, not an AI-generated list of generic actions.
+
+Acceptance gate: every intervention has at least one source locator; proposed and implemented actions render differently; projected and observed outcomes render differently; unknown evidence remains visible. At least one documented limitation or failed assumption is retained when the source supports it.
+
+======================================================================
+PROMPT 10 — MAKE CROSS-GRAPH MATCHING EXPLAINABLE AND USEFUL
+Target: 25 minutes
+======================================================================
+
+Implement a deterministic contextual matching engine between a target investigation's evidence and the solutions graph. This is the central differentiator. It must query persisted graph relationships and requirements, not return a prewritten answer keyed by city.
+
+Represent context with sourced or explicitly user-supplied features: hazard mechanism, geographic scale, relevant environmental findings, time horizon, and intervention prerequisites. Distinguish unknown, compatible, and incompatible. Unknown must never silently equal false or compatible. Do not infer drainage capacity, evacuation capacity, land ownership, water infrastructure, or budget from temperature and rainfall.
+
+Use hard incompatibility rules for genuinely conflicting mechanisms or required conditions. Rank remaining candidates transparently using weighted evidence matches and a separately displayed coverage measure. An ordinal match score is not a probability of success. A candidate with decisive unknown prerequisites should be “needs local evidence,” even if it shares several broad features.
+
+For every candidate return the complete rationale: matched features and evidence IDs; mismatches; unknown prerequisites; source outcome type; applicable spatial scale; reason for inclusion or exclusion; and the next evidence needed. Retrieve negative evidence alongside supportive evidence. Produce at most three useful planning leads with distinct tradeoffs.
+
+Demonstrate why Copenhagen and Brisbane share a flood category but differ in mechanism and scale. Surface-water retention may be a lead for an urban pluvial context; it must not be presented as a complete solution to basin-scale river flooding. If the target context is insufficient, say what must be established first rather than declaring a winner.
+
+Save each match run with graph version, feature inputs, rule version, and candidate IDs. Create candidate bridge edges with hypothesis status. This is transparent candidate-link generation; do not call it a trained link-prediction model.
+
+Acceptance gate: changing a relevant mechanism or prerequisite changes eligibility or the explanation; unrelated changes leave it stable; removing decisive evidence produces an unknown state. Show an actual cross-graph query behind a planning lead.
+
+======================================================================
+PROMPT 11 — BUILD A COPILOT THAT EXECUTES TOOLS AND UPDATES THE GRAPH
+Target: 35 minutes
+======================================================================
+
+Implement a server-side tool-using copilot with the existing model provider, or a configurable Anthropic provider when starting fresh. Verify the current SDK and configured model ID. Use an environment variable for the model; do not invent a latest model name. Keep credentials server-side.
+
+Expose narrowly scoped tools backed by real services: search_datasets, inspect_availability, acquire_series, analyze_trend, compare_variables, query_evidence_graph, retrieve_precedents, evaluate_transfer, save_hypothesis, and export_investigation. Use validated typed arguments and bounded result sizes. Graph writes must go through provenance validation. The model cannot submit raw SQL, shell commands, or arbitrary fetch URLs.
+
+The agent should resolve the active place/period, select relevant available variables, reuse cached data, invoke deterministic analysis, query the graph, retrieve precedents and conflicts, and compose a concise cited answer. Important numbers come from analysis objects, not model arithmetic. Existing context should avoid unnecessary clarification. Ask for genuinely missing infrastructure context only when it changes the result; otherwise record it as unknown.
+
+Stream real execution events: dataset selected, cache hit, fetch completed, analysis created, graph updated, precedent retrieved, answer ready. This is an action log with artifact IDs and durations, not hidden chain-of-thought or fake progress. Clicking an event opens the corresponding result. Support cancel, timeout, and retry without duplicate graph writes.
+
+Use a structured answer with Findings, Relevant precedents, Mismatches/unknowns, and Next evidence. Citations reference actual source/finding IDs and navigate to evidence sheets. Reject or revise unsupported factual claims before display. Treat source text as untrusted content, including instructions embedded in documents.
+
+Include a keyless guided-analysis workflow using the same tools and explicit templates. Label it “Guided analysis” rather than pretending an LLM ran. A missing model key must not disable maps, trend analysis, evidence inspection, or exports.
+
+Acceptance gate: ask a question from a fresh investigation, observe real tool calls, verify persisted evidence, and ask a follow-up that reuses it. Test a missing key and a provider error. No prewritten city response may bypass the pipeline.
+
+======================================================================
+PROMPT 12 — MAKE THE SAME SYSTEM WORK FOR A NEW PLACE
+Target: 30 minutes
+======================================================================
+
+Implement the “Investigate another place” workflow. Accept a searched place through a verified geocoding service and allow the user to inspect/select the returned location, or accept explicit coordinates and a drawn rectangle. Coordinate/rectangle input is the required no-geocoder fallback. Show and confirm the footprint through the normal form before acquisition.
+
+Validate latitude/longitude, area limits, and provider coverage. Handle or explicitly reject antimeridian-crossing bounds. Store geometry canonically. Do not send unsupported geometry types to an adapter or silently replace them with a different area. Display the provider's effective spatial support alongside the user's requested footprint.
+
+Let the user choose an investigation question such as changing rainfall, hotter/drier conditions, or historical planning analogs. Ask for a hazard mechanism when it cannot be determined from available evidence. Discover relevant catalog entries, acquire the supported numerical variables, run the exact same analysis functions, create graph evidence, and evaluate contextual precedents. Keep local infrastructure properties unknown until sourced or explicitly provided.
+
+If no historical event record exists for this place, it remains a valid regional trend investigation. Do not manufacture a disaster narrative to fill the screen. If no precedent satisfies the requirements, show the evidence gap and useful next questions.
+
+Choose a fifth place not in the seed manifests for an end-to-end functional test. Record it as a functional test location, not an independent validation study. Confirm that its coordinates and data requests differ from the four cases and that no source-city intervention is silently relabeled as a target-city fact.
+
+Provide a reusable investigation URL or saved ID within the existing session model. Reopening it restores geometry, artifacts, analyses, graph version, and conversation context. Show actual cached reuse when repeating the request.
+
+Acceptance gate: another location works without editing source code or adding a case manifest. Its numerical findings come from its own request, all analogs identify their source city, and unsupported transfer claims remain hypotheses. Capture the backend request and resulting artifact IDs as evidence.
+
+======================================================================
+PROMPT 13 — CREATE THE SIGNATURE INTERACTION: TRACE THIS RESPONSE
+Target: 25 minutes
+======================================================================
+
+Implement a single “Trace evidence” action on every planning lead and important copilot finding. It opens a focused, stable evidence view. The trace should show the candidate response, its contextual match requirements, the target's measured or supplied findings, the analysis and artifact ancestry, and the source precedent/outcome. Preserve the distinction between NASA measurement evidence and a policy document's reported outcome.
+
+Use a compact directed graph or layered evidence layout with roughly 8–20 visible nodes, plus a synchronized evidence table. Start with the relevant path; expand one neighborhood on demand. Use persistent positions or deterministic layout so nodes do not jump when selected. Avoid a force-directed hairball or continuous particle motion.
+
+Encode node type and assertion status with shape/icon/text as well as restrained color. Solid connections denote stored documented/computed relationships; hypothesis bridges are visibly distinct. Conflicting evidence must be reachable from the same inspector. Hyperedge bundles open a member-role sheet, not an unexplained cluster of identical edges.
+
+Selecting a finding highlights its chart interval and map footprint. Selecting a source opens the exact page/section when available. Selecting a requirement shows whether it is satisfied, contradicted, or unknown and why. Selecting an analysis exposes units, method, interval, coverage, and artifact hash. Selecting a response shows its original location and outcome evidence type.
+
+Add a one-time 250–400ms path highlight on explicit user trace actions, disabled for reduced motion. Add keyboard navigation and a fully usable tabular fallback. Copilot citations, graph nodes, map features, and inspector records must resolve to the same stable IDs.
+
+Acceptance gate: from one suggested response, a reviewer reaches the numerical source and the intervention source within a few interactions, can inspect a mismatch, and can distinguish measured facts from hypotheses. Every displayed edge is read from persistence. Remove any decorative edge that lacks semantics.
+
+======================================================================
+PROMPT 14 — SHOW HOW THE SYSTEM CHANGES WHEN EVIDENCE CHANGES
+Target: 20 minutes
+======================================================================
+
+Implement versioned investigation evidence and dependency-aware recomputation. This is the concrete meaning of “learns from it” for this MVP: the evidence base and derived assessments update. Do not claim that a neural model retrains itself.
+
+Allow the user to add or correct an investigation assumption, attach an already-ingested source record, or mark a claim disputed. Use explicit action labels such as “Add planning assumption” and “Link source.” A user assumption must remain separate from verified source evidence. Do not provide arbitrary server-side URL ingestion during this sprint.
+
+Create immutable revisions with prior revision ID, changed fields, author/session, time, and rationale. Preserve G0 and G1. Use graph dependencies to identify affected match runs or summaries; reuse unchanged source artifacts and numerical analyses. Cache keys for matching must include relevant graph/rule versions. A revision should not refetch NASA data unless its acquisition inputs changed.
+
+Add a “What changed?” view: new or revised evidence, affected candidates, changed or unchanged eligibility, and the source/assumption responsible. If the best candidate does not change, say so and explain which requirements are still unresolved. Never force a dramatic ranking flip for the demo.
+
+Prepare a truthful scenario: start with a missing infrastructure prerequisite, then add an explicitly labeled planning assumption or a verified source describing it. Compare the previous and current assessment. Also support switching back to the prior version without destroying the new one.
+
+Acceptance gate: a revision persists after restart, dependent matches recompute, unchanged raw artifacts are reused, both versions remain inspectable, and another session cannot alter or access the private revision. The UI never promotes a scenario assumption into a sourced fact.
+
+======================================================================
+PROMPT 15 — PACKAGE COMPARISON AND EXPORT AS REAL WORK PRODUCTS
+Target: 15 minutes
+======================================================================
+
+Create a case-comparison view and a portable investigation report. Comparison should help explain mechanisms and evidence, not suggest cities are interchangeable.
+
+Compare two selected cases with aligned fields: hazard mechanism, analysis period, spatial support, variable definition, estimated trend and interval, event evidence, documented responses, outcome type, and transfer limitations. Only compare numeric values directly when units and aggregation are compatible. Label unavailable comparisons clearly. The original four cases and newly saved investigations use the same component.
+
+Implement downloads for normalized time-series CSV, investigation JSON including graph/provenance references, and a self-contained printable HTML report. Include investigation title, geometry, period, variable definitions, computed findings, methods, uncertainty, source links, artifact hashes, graph revision, planning leads, mismatches, unknowns, and retrieval dates. Include charts rendered from actual results. Escape all untrusted text in exports.
+
+Reports should use the same Field Atlas typography and visual hierarchy, with a clean light print layout. A reader must be able to understand which claims came from NASA data and which came from historical documents without access to chat history.
+
+Do not put API keys, session capabilities, private prompts, or raw internal logs into reports. Public sharing is optional; local export is required. If a portable JSON lacks raw data, say precisely which referenced artifacts are needed for reproduction.
+
+Acceptance gate: download all three formats from a completed investigation, reopen them, verify the displayed period and numbers match the app, and confirm the source links and graph revision are present. No export button may merely display a success toast.
+
+======================================================================
+PROMPT 16 — AUDIT SCIENCE, RUNTIME BEHAVIOR, AND FAILURE PATHS
+Target: 35 minutes
+======================================================================
+
+Freeze feature scope. Trace and test the actual runtime path: UI question → server tool call → acquisition/cache → numerical analysis → persisted graph → contextual retrieval → cited answer → evidence trace → export. Fix broken links in this chain before any cosmetic change.
+
+Run focused checks:
+1. Four seed cases and one new place use genuine acquired or previously saved real data.
+2. Geometry, provider footprint, units, dates, missing values, annual-summary exclusion, and precipitation conversion are correct.
+3. Trends use the declared method, regular monthly spacing, stated uncertainty, and fixed test families. Nonsignificant findings remain visible.
+4. Repeating a request reuses the correct artifact. Changing relevant inputs invalidates the correct cache. Evidence revisions affect only dependent results.
+5. Source citations resolve. Proposed/implemented and modeled/observed outcomes remain distinguishable. Correlation and hypotheses are not restated as causation.
+6. Agent calls are real, schema-validated, bounded, and idempotent where required. Keys and session data remain isolated. Malicious instructions in a source cannot trigger tools.
+7. Missing keys, provider failures, unavailable imagery, invalid geometry, sparse data, and WebGL failure produce useful states.
+8. All visible controls work at the target screen sizes; keyboard focus, legends, text contrast, reduced motion, and source drawers are usable.
+
+Before tuning retrieval further, write eight small evaluation questions with source-backed expected distinctions. Include a flood-mechanism mismatch, an unknown prerequisite, an outcome that is projected rather than observed, a wildfire lesson that cannot authorize live routing, and a new-city case without sufficient local context. Compare graph-assisted retrieval with a simple keyword baseline using the same evidence corpus. Score source correctness, useful mismatch detection, and unsupported claims. Report actual counts, including ties or regressions; eight questions are a smoke test, not proof of general superiority.
+
+Create VERIFICATION.md listing executed checks, results, dataset/provider counts, limitations, and unresolved blockers. Capture screenshots from the real app, not rendered mockups. Do not run broad redundant tests after the required checks pass unless new changes justify them.
+
+Acceptance gate: the core flow completes from a fresh session and after restart. Every major demo claim has observed evidence or is explicitly described as roadmap. Critical defects get fixed; optional features get cut.
+
+======================================================================
+PROMPT 17 — SHIP A COHERENT DEMO AND AN HONEST SUBMISSION
+Target: 25 minutes
+======================================================================
+
+Package the working application for the available deployment target, preserving the existing stack and persistent data model. Use already configured hosting when appropriate. If a public deployment needs unavailable credentials, finish the container, startup instructions, and local demo first, then state the exact blocked step. Do not report a local URL as a public deployment. Do not create a paid service or submit the hackathon entry automatically.
+
+Verify the deployed or packaged application from a fresh session: load, acquire/reuse a real dataset, create a trend finding, run the copilot or clearly labeled guided mode, inspect a source path, reopen the investigation, and export. Keep real source snapshots available for unreliable provider connectivity, with acquisition dates visible.
+
+Write a 2-minute demo script around actions, not feature claims:
+0:00–0:15: Open a completed flood investigation and state the planning question.
+0:15–0:40: Show a real NASA time series, slope, uncertainty, spatial support, and source. Use the actual result, even if no significant trend is found.
+0:40–1:05: Ask what can be learned from another flood case. Show the mechanism mismatch and contextual requirements.
+1:05–1:25: Trace a planning lead through the target evidence and the historical source.
+1:25–1:45: Add a labeled assumption or sourced revision, inspect what changed, and demonstrate cached data reuse.
+1:45–2:00: Open a fifth-place investigation created through the same workflow and export its report. If this was prepared earlier, call it a saved run.
+
+Write submission copy explaining the problem, implemented behavior, NASA data used, evidence-graph contribution, limits, and next steps. Map the deliverable explicitly to the challenge: variable selection; regional acquisition; time-series visualization; rate and significance analysis. Keep disaster planning as the applied investigation context.
+
+Roadmap can include additional numerical mission adapters, higher-resolution validated hazard models, broader intervention evidence, and evaluated temporal link prediction. Current capabilities must not include live rescue routing, event forecasting, causal attribution, or a trained hypergraph model unless actually built and validated.
+
+Deliver the app URL if verified, repository/run instructions, screenshots, demo script, verification report, and a short list of any remaining limitations. Do not promise a prize or imply statistical validation from four examples. The final pitch is: “Inspect the change. Trace the evidence. Compare what might transfer.”
+
+Acceptance gate: a fresh reviewer can start or open the delivered app, complete the core investigation, inspect its sources, and export the result using the supplied instructions. Deployment status and any remaining blockers are stated accurately, and the demo script describes only verified behavior.
+
+======================================================================
+SOURCE STARTING POINTS AND REFERENCE NOTES
+======================================================================
+
+Challenge brief supplied by the user:
+https://www.spaceappschallenge.org/2026/challenges/earth-system-trend-detective/
+Use the supplied full brief for scope. Confirm the event's current submission rules, dates, and page availability independently before submitting.
+
+Design references:
+https://kepler.gl/
+https://docs.kepler.gl/docs/user-guides
+https://bestdesignsonx.com/
+Kepler's reference interactions include layers, filters, brushing, temporal playback, and map comparison. The live earthquake demo's controls were inspected, but its map produced a rendering error in this research browser. Best Designs on X was used as a gallery reference for typography, compact controls, and composition; no particular designer's assets or animations are licensed by this pack.
+
+NASA POWER monthly API:
+https://power.larc.nasa.gov/docs/services/api/temporal/monthly/
+Verify current parameter metadata, source resolution, request limits, and response units. The documented meteorological inputs are derived from MERRA-2; catalog breadth must not be presented as independent measurement corroboration.
+
+NASA GIBS developer reference:
+https://nasa-gibs.github.io/gibs-api-docs/access-advanced-topics/
+Use documented layer metadata and date availability. Imagery tiles serve visual context; numerical analysis requires the underlying science data or a suitable numerical provider.
+
+Statistical implementation reference:
+https://www.statsmodels.org/stable/generated/statsmodels.regression.linear_model.OLSResults.get_robustcov_results.html
+HAC configuration is an explicit implementation choice in this pack. Bandwidth, data sufficiency, and inference assumptions still require disclosure; a library function does not validate the scientific model automatically.
+
+Copenhagen official European adaptation case study:
+https://climate-adapt.eea.europa.eu/en/metadata/case-studies/the-economics-of-managing-heavy-rains-and-stormwater-in-copenhagen-2013-the-cloudburst-management-plan
+Cloudburst plan PDF linked by that case study:
+https://climate-adapt.eea.europa.eu/en/metadata/case-studies/the-economics-of-managing-heavy-rains-and-stormwater-in-copenhagen-2013-the-cloudburst-management-plan/cloudburst_management_plan_2012.pdf
+
+Brisbane official flood history:
+https://www.bom.gov.au/qld/flood/fld_history/brisbane_history.shtml
+Additional inquiry-document discovery starting point:
+https://knowledge.aidr.org.au/resources/flood-queensland-2010-2011/
+Follow to the original inquiry/government source for intervention claims; the BOM history primarily supports event characterization.
+
+Camp Fire NIST investigation:
+https://www.nist.gov/publications/case-study-camp-fire-notification-evacuation-traffic-and-temporary-refuge-areas-nettra
+https://www.nist.gov/programs-projects/wildland-urban-interface-wui-fire-data-collection-parcel-vulnerabilities/nist/life
+Use the report's actual observations and conclusions with page locators. Retrospective event reconstruction is not a live evacuation service.
+
+Cape Town municipal strategy:
+https://www.capetown.gov.za/media-and-news/city-s-water-strategy-approved-by-council/
+https://resource.capetown.gov.za/documentcentre/Documents/City%20strategies%2C%20plans%20and%20frameworks/Cape%20Town%20Water%20Strategy.pdf
+Separate the drought/crisis response described retrospectively from the commitments in the later strategy.
+
+END OF PACK

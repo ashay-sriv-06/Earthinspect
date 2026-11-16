@@ -1,0 +1,161 @@
+{
+ "verified_at": "2026-11-16T02:45:23.919101+00:00",
+ "endpoint": "https://cmr.earthdata.nasa.gov/search/collections.json",
+ "results": {
+  "M2TMNXSLV": [
+   {
+    "version": "5.12.4",
+    "title": "MERRA-2 tavgM_2d_slv_Nx: 2d,Monthly mean,Time-Averaged,Single-Level,Assimilation,Single-Level Diagnostics 0.625 x 0.5 degree V5.12.4 (M2TMNXSLV)",
+    "data_center": "GES_DISC",
+    "time_start": "1980-01-01T00:00:00.000Z",
+    "time_end": null,
+    "concept_id": "C1276812859-GES_DISC"
+   }
+  ],
+  "GPM_3IMERGM": [
+   {
+    "version": "07",
+    "title": "GPM IMERG Final Precipitation L3 1 month 0.1 degree x 0.1 degree V07 (GPM_3IMERGM)",
+    "data_center": "GES_DISC",
+    "time_start": "1998-01-01T00:00:00.000Z",
+    "time_end": "2025-09-30T23:59:59.999Z",
+    "concept_id": "C2723754851-GES_DISC"
+   }
+  ],
+  "MOD11A2": [
+   {
+    "version": "061",
+    "title": "MODIS/Terra Land Surface Temperature/Emissivity 8-Day L3 Global 1km SIN Grid V061",
+    "data_center": "LPCLOUD",
+    "time_start": "2000-02-18T00:00:00.000Z",
+    "time_end": null,
+    "concept_id": "C2269056084-LPCLOUD"
+   }
+  ],
+  "MOD13Q1": [
+   {
+    "version": "061",
+    "title": "MODIS/Terra Vegetation Indices 16-Day L3 Global 250m SIN Grid V061",
+    "data_center": "LPCLOUD",
+    "time_start": "2000-02-18T00:00:00.000Z",
+    "time_end": null,
+    "concept_id": "C1748066515-LPCLOUD"
+   }
+  ],
+  "MCD64A1": [
+   {
+    "version": "061",
+    "title": "MODIS/Terra+Aqua Direct Broadcast Burned Area Monthly L3 Global 500m SIN Grid V061",
+    "data_center": "LPCLOUD",
+    "time_start": "2000-11-01T00:00:00.000Z",
+    "time_end": null,
+    "concept_id": "C2565786756-LPCLOUD"
+   }
+  ],
+  "VNP14IMGTDL_NRT": [
+   {
+    "version": "2",
+    "title": "VIIRS (S-NPP) I Band 375 m Active Fire Product NRT (Vector data)",
+    "data_center": "LANCEMODIS",
+    "time_start": "2016-01-01T00:00:00.000Z",
+    "time_end": null,
+    "concept_id": "C1942970257-LANCEMODIS"
+   }
+  ],
+  "MCD14ML": [],
+  "SPL3SMP_E": [
+   {
+    "version": "006",
+    "title": "SMAP Enhanced L3 Radiometer Global and Polar Grid Daily 9 km EASE-Grid Soil Moisture V006",
+    "data_center": "NSIDC_CPRD",
+    "time_start": "2015-03-31T00:00:00.000Z",
+    "time_end": null,
+    "concept_id": "C2938664763-NSIDC_CPRD"
+   }
+  ],
+  "GLDAS_NOAH025_M": [
+   {
+    "version": "2.1",
+    "title": "GLDAS Noah Land Surface Model L4 monthly 0.25 x 0.25 degree V2.1 (GLDAS_NOAH025_M)",
+    "data_center": "GES_DISC",
+    "time_start": "2000-01-01T00:00:00.000Z",
+    "time_end": null,
+    "concept_id": "C1342986036-GES_DISC"
+   },
+   {
+    "version": "2.0",
+    "title": "GLDAS Noah Land Surface Model L4 monthly 0.25 x 0.25 degree V2.0 (GLDAS_NOAH025_M)",
+    "data_center": "GES_DISC",
+    "time_start": "1948-01-01T00:00:00.000Z",
+    "time_end": "2014-12-31T23:59:59.999Z",
+    "concept_id": "C1233767569-GES_DISC"
+   }
+  ],
+  "TELLUS_GRAC-GRFO_MASCON_CRI_GRID_RL06.3_V4": [
+   {
+    "version": "RL06.3Mv04",
+    "title": "JPL GRACE and GRACE-FO Mascon Ocean, Ice, and Hydrology Equivalent Water Height Coastal Resolution Improvement (CRI) Filtered Release 06.3 Version 04",
+    "data_center": "POCLOUD",
+    "time_start": "2002-04-04T00:00:00.000Z",
+    "time_end": null,
+    "concept_id": "C3195527175-POCLOUD"
+   }
+  ],
+  "AIRS3STM": [
+   {
+    "version": "7.0",
+    "title": "Aqua/AIRS L3 Monthly Standard Physical Retrieval (AIRS-only) 1 degree x 1 degree V7.0",
+    "data_center": "GES_DISC",
+    "time_start": "2002-09-01T00:00:00.000Z",
+    "time_end": null,
+    "concept_id": "C1701805662-GES_DISC"
+   },
+   {
+    "version": "006",
+    "title": "AIRS/Aqua L3 Monthly Standard Physical Retrieval (AIRS-only) 1 degree x 1 degree V006 (AIRS3STM)",
+    "data_center": "GES_DISC",
+    "time_start": "2002-09-01T00:00:00.000Z",
+    "time_end": null,
+    "concept_id": "C1238517301-GES_DISC"
+   }
+  ],
+  "OMNO2d": [
+   {
+    "version": "004",
+    "title": "OMI/Aura NO2 Cloud-Screened Total and Tropospheric Column L3 Global Gridded 0.25 degree x 0.25 degree Ver 5.0, Col 004 (OMNO2d)",
+    "data_center": "GES_DISC",
+    "time_start": "2004-10-01T00:00:00.000Z",
+    "time_end": null,
+    "concept_id": "C3333493715-GES_DISC"
+   },
+   {
+    "version": "003",
+    "title": "OMI/Aura NO2 Cloud-Screened Total and Tropospheric Column L3 Global Gridded 0.25 degree x 0.25 degree V3 (OMNO2d)",
+    "data_center": "GES_DISC",
+    "time_start": "2004-10-01T00:00:00.000Z",
+    "time_end": null,
+    "concept_id": "C1266136111-GES_DISC"
+   }
+  ],
+  "SRTMGL1": [
+   {
+    "version": "003",
+    "title": "NASA Shuttle Radar Topography Mission Global 1 arc second V003",
+    "data_center": "LPCLOUD",
+    "time_start": "2000-02-11T00:00:00.000Z",
+    "time_end": "2000-02-21T23:59:59.000Z",
+    "concept_id": "C2763266360-LPCLOUD"
+   }
+  ],
+  "HLSL30": [
+   {
+    "version": "2.0",
+    "title": "HLS Landsat Operational Land Imager Surface Reflectance and TOA Brightness Daily Global 30m v2.0",
+    "data_center": "LPCLOUD",
+    "time_start": "2013-04-11T00:00:00.000Z",
+    "time_end": null,
+    "concept_id": "C2021957657-LPCLOUD"
+   }
+  ]
+ }
+}

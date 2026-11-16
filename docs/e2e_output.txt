@@ -1,0 +1,32 @@
+﻿PASS health ok, artifacts=20, llm=False
+PASS four case files
+PASS copenhagen-2011: every intervention has source locator
+PASS brisbane-2011: every intervention has source locator
+PASS camp-fire-2018: every intervention has source locator
+PASS cape-town-2015-2018: every intervention has source locator
+PASS case data reused from cache: 4 cached
+PASS trend analysis reused (prewarmed)
+PASS Copenhagen T2M +0.587 C/dec q=1.3e-05
+PASS other session cannot read investigation
+PASS other session cannot revise
+PASS provenance reaches ['Analysis', 'Artifact', 'Dataset', 'Finding', 'Variable']
+PASS leads: [('int-cph-legislation', 'needs_local_evidence'), ('int-cph-service-level', 'needs_local_evidence'), ('int-cph-combined-surface-tunnel', 'needs_local_evidence')]
+PASS wildfire responses excluded for pluvial target
+PASS Brisbane response is mechanism mismatch for Copenhagen: partial_component_only
+PASS what-changed: [('int-cph-combined-surface-tunnel', {'from': 'needs_local_evidence', 'to': 'needs_local_evidence'})]
+PASS repeat ingestion idempotent (nodes 181, bundles 16)
+PASS revision did not trigger refetch
+PASS prior revision match still inspectable (reused)
+PASS trace node types ['Analysis', 'Artifact', 'Dataset', 'Event', 'Finding', 'Intervention', 'Investigation', 'Mechanism', 'Place', 'Requirement', 'Source'] edges=11
+PASS guided run done with 23 events: ['run_started', 'tool_call', 'tool_result', 'dataset_selected', 'tool_call', 'acquire_started', 'cache_cached', 'acquire_started', 'cache_cached', 'acquire_started', 'cache_cached', 'acquire_started']
+PASS answer findings cited
+PASS llm mode without key -> 409 llm_unavailable
+PASS export csv: 140347 bytes
+PASS export json: 27692 bytes
+PASS export html: 31462 bytes
+PASS export JSON carries graph version + artifact hashes
+PASS new place analysis ana-de3b6c7a93f2 in 0.0s; cache states ['cache_cached', 'cache_cached', 'cache_cached', 'cache_cached']
+PASS new place leads keep source city: [('Copenhagen 2011', 'needs_local_evidence'), ('Copenhagen 2011', 'needs_local_evidence'), ('Copenhagen 2011', 'needs_local_evidence')]
+PASS repeat new-place request reused cache
+PASS antimeridian rejected
+{"new_place_artifacts": ["art-5ef1021e9e03-v1", "art-f9a6fd2686f2-v1", "art-b8c4b1cbd985-v1", "art-1c47f908da9a-v1"]}

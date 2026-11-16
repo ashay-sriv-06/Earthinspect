@@ -1,0 +1,10 @@
+# Direct dependencies (exact resolved versions are in requirements.lock.txt)
+fastapi
+uvicorn[standard]
+httpx
+pydantic
+numpy
+pandas
+statsmodels
+anthropic
+pytest

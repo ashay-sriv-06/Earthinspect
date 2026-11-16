@@ -1,0 +1,225 @@
+{
+ "summary": {
+  "questions": 8,
+  "graph": {
+   "source_correct": 21,
+   "mismatch_detected": 9,
+   "unsupported": 0,
+   "qualifications_possible": 9,
+   "source_correct_possible": 21
+  },
+  "keyword": {
+   "source_correct": 16,
+   "mismatch_detected": 0,
+   "unsupported": 8,
+   "qualifications_possible": 9,
+   "source_correct_possible": 21
+  },
+  "notes": [
+   "Keyword baseline ranks the same intervention records by token overlap; it carries no mechanism, prerequisite or outcome-type reasoning, so it cannot score qualification checks.",
+   "Eight questions are a smoke test written by the builders; they are not an independent benchmark."
+  ]
+ },
+ "rows": [
+  {
+   "id": "Q1-flood-mechanism-mismatch",
+   "basis": "Copenhagen plan addresses pluvial cloudbursts (Climate-ADAPT); Brisbane 2011 was a river/catchment flood (BoM).",
+   "graph_top3": [
+    "int-bri-dam-operations",
+    "int-bri-catchment-flood-study",
+    "int-bri-flood-mapping-public"
+   ],
+   "keyword_top3": [
+    "int-cph-combined-surface-tunnel",
+    "int-bri-dam-operations",
+    "int-cf-safety-zones"
+   ],
+   "graph": {
+    "source_correct": "3/3",
+    "qualifications_detected": "1/1",
+    "unsupported": 0
+   },
+   "keyword": {
+    "source_correct": "2/3",
+    "qualifications_detected": "0/1",
+    "unsupported": 1
+   },
+   "need": 1
+  },
+  {
+   "id": "Q2-unknown-prerequisite",
+   "basis": "Plan prerequisite: public open space for detention (Cloudburst plan) \u2014 unknown for the target.",
+   "graph_top3": [
+    "int-cph-legislation",
+    "int-cph-service-level",
+    "int-cph-combined-surface-tunnel"
+   ],
+   "keyword_top3": [
+    "int-cph-combined-surface-tunnel",
+    "int-bri-flood-mapping-public",
+    "int-cf-notification"
+   ],
+   "graph": {
+    "source_correct": "3/3",
+    "qualifications_detected": "1/1",
+    "unsupported": 0
+   },
+   "keyword": {
+    "source_correct": "2/3",
+    "qualifications_detected": "0/1",
+    "unsupported": 1
+   },
+   "need": 1
+  },
+  {
+   "id": "Q3-projected-outcome",
+   "basis": "Economic results are projections in the plan, not observed outcomes (Climate-ADAPT).",
+   "graph_top3": [
+    "int-cph-legislation",
+    "int-cph-service-level",
+    "int-cph-combined-surface-tunnel"
+   ],
+   "keyword_top3": [
+    "int-bri-flood-mapping-public",
+    "int-cph-combined-surface-tunnel",
+    "int-cph-legislation"
+   ],
+   "graph": {
+    "source_correct": "3/3",
+    "qualifications_detected": "1/1",
+    "unsupported": 0
+   },
+   "keyword": {
+    "source_correct": "3/3",
+    "qualifications_detected": "0/1",
+    "unsupported": 0
+   },
+   "need": 1
+  },
+  {
+   "id": "Q4-wildfire-no-live-routing",
+   "basis": "NIST TN 2252: refuge areas are a last resort; recommendations are retrospective, not a routing service.",
+   "graph_top3": [
+    "int-cf-notification",
+    "int-cf-evacuation-planning",
+    "int-cf-safety-zones"
+   ],
+   "keyword_top3": [
+    "int-cf-safety-zones",
+    "int-cf-evacuation-planning",
+    "int-cph-combined-surface-tunnel"
+   ],
+   "graph": {
+    "source_correct": "3/3",
+    "qualifications_detected": "2/2",
+    "unsupported": 0
+   },
+   "keyword": {
+    "source_correct": "2/3",
+    "qualifications_detected": "0/2",
+    "unsupported": 1
+   },
+   "need": 2
+  },
+  {
+   "id": "Q5-new-city-insufficient",
+   "basis": "No mechanism established: no precedent may be presented as transferable.",
+   "graph_top3": [
+    "int-bri-catchment-flood-study",
+    "int-bri-dam-operations",
+    "int-bri-flood-mapping-public"
+   ],
+   "keyword_top3": [
+    "int-cph-service-level",
+    "int-bri-dam-operations",
+    "int-cph-legislation"
+   ],
+   "graph": {
+    "source_correct": "n/a (no mechanism)",
+    "qualifications_detected": "1/1",
+    "unsupported": 0
+   },
+   "keyword": {
+    "source_correct": "n/a (no mechanism)",
+    "qualifications_detected": "0/1",
+    "unsupported": 3
+   },
+   "need": 1
+  },
+  {
+   "id": "Q6-drought-demand-ready",
+   "basis": "Cape Town Water Strategy: restrictions & tariffs implemented during the crisis; prerequisites supplied as assumptions.",
+   "graph_top3": [
+    "int-ct-restrictions-tariffs",
+    "int-ct-new-supply-programme",
+    "int-ct-pressure-management"
+   ],
+   "keyword_top3": [
+    "int-ct-restrictions-tariffs",
+    "int-ct-pressure-management",
+    "int-ct-new-supply-programme"
+   ],
+   "graph": {
+    "source_correct": "3/3",
+    "qualifications_detected": "1/1",
+    "unsupported": 0
+   },
+   "keyword": {
+    "source_correct": "3/3",
+    "qualifications_detected": "0/1",
+    "unsupported": 0
+   },
+   "need": 1
+  },
+  {
+   "id": "Q7-drought-vs-flood-green-space",
+   "basis": "Flood retention (Copenhagen) addresses a different hazard family than supply drought.",
+   "graph_top3": [
+    "int-ct-new-supply-programme",
+    "int-ct-pressure-management",
+    "int-ct-restrictions-tariffs"
+   ],
+   "keyword_top3": [
+    "int-cph-combined-surface-tunnel",
+    "int-cph-legislation",
+    "int-ct-new-supply-programme"
+   ],
+   "graph": {
+    "source_correct": "3/3",
+    "qualifications_detected": "1/1",
+    "unsupported": 0
+   },
+   "keyword": {
+    "source_correct": "1/3",
+    "qualifications_detected": "0/1",
+    "unsupported": 2
+   },
+   "need": 1
+  },
+  {
+   "id": "Q8-prerequisite-unsatisfied",
+   "basis": "Decisive prerequisite (open space for detention) not satisfied.",
+   "graph_top3": [
+    "int-cph-legislation",
+    "int-cph-service-level",
+    "int-bri-catchment-flood-study"
+   ],
+   "keyword_top3": [
+    "int-cph-combined-surface-tunnel",
+    "int-cph-legislation",
+    "int-bri-flood-mapping-public"
+   ],
+   "graph": {
+    "source_correct": "3/3",
+    "qualifications_detected": "1/1",
+    "unsupported": 0
+   },
+   "keyword": {
+    "source_correct": "3/3",
+    "qualifications_detected": "0/1",
+    "unsupported": 0
+   },
+   "need": 1
+  }
+ ]
+}

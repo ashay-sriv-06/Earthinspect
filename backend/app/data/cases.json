@@ -1,0 +1,937 @@
+[
+ {
+  "id": "copenhagen-2011",
+  "event_start": "2011-07-02",
+  "event_end": "2011-07-02",
+  "event_point": {
+   "lon": 12.57,
+   "lat": 55.68,
+   "label": "city reference point (Copenhagen city centre), not a measured rainfall or flood location"
+  },
+  "hazard_mechanism": "pluvial_urban_flood",
+  "summary": "An extreme rainfall event on 2 July 2011 caused pluvial (surface-water) flooding in Copenhagen; the City's 2012 Cloudburst Management Plan puts the damage at DKK 5-6 bn, while the Climate-ADAPT case study says more than DKK 6bn. The City concluded the event showed that its earlier approach of storing rainwater in buffer areas was inadequate, and it responded with the 2012 Cloudburst Management Plan, which combines surface (green/blue) drainage with tunnels over a minimum 20-year timeframe.",
+  "sources": [
+   {
+    "id": "src-cph-climateadapt",
+    "url": "https://climate-adapt.eea.europa.eu/en/metadata/case-studies/the-economics-of-managing-heavy-rains-and-stormwater-in-copenhagen-2013-the-cloudburst-management-plan",
+    "publisher": "Climate-ADAPT (European Environment Agency / European Commission)",
+    "title": "The economics of managing heavy rains and stormwater in Copenhagen - The Cloudburst Management Plan",
+    "published": "2016-06-07",
+    "retrieved": "2026-11-15",
+    "locator": "sections: Challenges; Solutions; Costs and benefits; Success and limiting factors; Legal aspects; Implementation time",
+    "status": "verified"
+   },
+   {
+    "id": "src-cph-plan2012",
+    "url": "https://climate-adapt.eea.europa.eu/en/metadata/case-studies/the-economics-of-managing-heavy-rains-and-stormwater-in-copenhagen-2013-the-cloudburst-management-plan/cloudburst_management_plan_2012.pdf",
+    "publisher": "City of Copenhagen (hosted by Climate-ADAPT)",
+    "title": "The City of Copenhagen Cloudburst Management Plan 2012",
+    "published": "2012",
+    "retrieved": "2026-11-15",
+    "locator": "printed pages 2-23 (text extracted from PDF; page numbers from printed page headers)",
+    "status": "verified"
+   }
+  ],
+  "event_facts": [
+   {
+    "claim": "The extreme rainfall of 2 July 2011 showed that storing rainwater in buffer areas (parks, open spaces) was inadequate to prevent pluvial flooding in large parts of the city.",
+    "source_id": "src-cph-plan2012",
+    "locator": "p. 7, section 3.1",
+    "excerpt": "The extreme rainfall event of 2 July 2011 and subsequent calculations have now proved beyond question that this method is inadequate in preventing pluvial flooding"
+   },
+   {
+    "claim": "The plan's preface states that the previous year's downpour caused DKK 5-6 bn of damage in Copenhagen.",
+    "source_id": "src-cph-plan2012",
+    "locator": "p. 2, Preface",
+    "excerpt": "last year's intense downpour caused damage to the tune of DKK 5 - 6 bn in Copenhagen."
+   },
+   {
+    "claim": "Climate-ADAPT states the largest of four major rainfall events in six years, in 2011, caused damage of more than DKK 6bn.",
+    "source_id": "src-cph-climateadapt",
+    "locator": "section: Challenges",
+    "excerpt": "The largest, in 2011, caused damage totalling more than DKK 6bn."
+   },
+   {
+    "claim": "The City developed a Cloudburst Management Plan in 2012 to reduce pluvial flooding impacts from heavy rain.",
+    "source_id": "src-cph-climateadapt",
+    "locator": "sections: Case study description; Objectives",
+    "excerpt": "to reduce the impacts of pluvial flooding due to heavy rains"
+   }
+  ],
+  "interventions": [
+   {
+    "id": "int-cph-combined-surface-tunnel",
+    "title": "Cloudburst Management Plan: combined surface (green/blue) drainage and tunnels",
+    "category": "surface-water retention and conveyance",
+    "objective": "Drain or store extreme stormwater at ground level (detention parks, green roads, roads with high kerbs leading water to flow routes) and use tunnels where surface drainage is not possible.",
+    "status": "proposed",
+    "status_note": "Adopted as a plan in 2012; Climate-ADAPT (2016) says the projects are 'only starting to be implemented now on a yearly basis'. Neither source reports completed outcomes.",
+    "prerequisites": [
+     "public open space (parks, squares) available for temporary detention",
+     "street space for conveyance routes with raised kerbs",
+     "flow routes to a receiving water body (harbour/sea)",
+     "tunnel option where dense development leaves no surface space",
+     "coordination with the water utility and neighbouring municipalities"
+    ],
+    "scale": "city",
+    "time_horizon": "minimum 20-year plan (about 15 projects a year over 20-30 years per Climate-ADAPT)",
+    "constraints": [
+     "Green and blue solutions are not suitable in densely built-up areas (plan p. 2).",
+     "Road owners decide whether projects are implemented; roads may need to be purchased, which requires cooperation between municipalities and private landowners (Climate-ADAPT, Success and limiting factors).",
+     "Stormwater needs treatment for water quality; solutions were still being tested (Climate-ADAPT, Success and limiting factors)."
+    ],
+    "reported_outcome": "Climate-ADAPT reports projections: the combined solution costs DKK 11bn at 2015 prices to build, with an expected overall benefit of DKK 5bn, and is about DKK 9bn better than a traditional sewer solution. The plan itself (2012) estimates construction costs up to 2033 at DKK 3.8 bn in present-day prices. These are cost-benefit projections, not observed results.",
+    "outcome_type": "projected",
+    "limitations": [
+     "The plan states its calculations 'contain both technical and economic uncertainties' (p. 6).",
+     "The plan's 2012 cost estimate (DKK 3.8 bn) and Climate-ADAPT's 2015-price figure (DKK 11bn) differ; they come from different documents, bases and dates.",
+     "Earlier assumption that storage in buffer areas would suffice was found inadequate after 2 July 2011 (p. 7)."
+    ],
+    "source_id": "src-cph-plan2012",
+    "locator": "p. 2 (Preface), p. 6 (Recommendations), p. 8 (section 3), p. 14 (20-year time frame); Climate-ADAPT sections Solutions and Costs and benefits",
+    "published": "2012",
+    "requirements": [
+     {
+      "id": "req-open-space-retention",
+      "why": "Public open space for temporary detention (plan prerequisite)",
+      "decisive": true
+     },
+     {
+      "id": "req-receiving-water",
+      "why": "Flow routes to a receiving water body (harbour/sea)",
+      "decisive": true
+     },
+     {
+      "id": "req-drainage-capacity-known",
+      "why": "Knowledge of where sewers are overwhelmed",
+      "decisive": false
+     },
+     {
+      "id": "req-long-term-capital-funding",
+      "why": "Multi-decade financing of the works",
+      "decisive": false
+     }
+    ],
+    "signals": [
+     {
+      "variable": "PRECTOTCORR",
+      "direction": "increase",
+      "note": "Monthly mean precipitation cannot resolve cloudburst or flood-peak intensity; context only."
+     }
+    ],
+    "overlay_note": "Requirement mapping and 'decisive' flags are analyst judgements linking the documented prerequisites to generic concepts; they are not claims made by the source."
+   },
+   {
+    "id": "int-cph-service-level",
+    "title": "Risk-dimensioning service level: 100-year event, about 10 cm of water on streets",
+    "category": "design standard / level of service",
+    "objective": "Limit potentially damaging floods to those that statistically occur only once every 100 years, defining damaging as water levels reaching 10 cm on streets.",
+    "status": "proposed",
+    "prerequisites": [
+     "agreed return-period design standard",
+     "hydraulic modelling of catchments",
+     "street and kerb design that keeps water away from basement entrances"
+    ],
+    "scale": "city",
+    "time_horizon": "minimum 20-year plan",
+    "constraints": [
+     "The plan says protecting against events with return periods over 100 years would be disproportionately expensive compared with the resulting damage (p. 6)."
+    ],
+    "reported_outcome": "The plan's analyses found a negligible risk of water entering basement windows when water on roadways is kept at about 10 cm (p. 11). This is a modelled finding.",
+    "outcome_type": "modeled",
+    "limitations": [
+     "The plan notes that about 10 cm of water on roadways is likely to reduce passability during and after an event (p. 11)."
+    ],
+    "source_id": "src-cph-plan2012",
+    "locator": "p. 6 (Recommendations), p. 11 (section 4.1), p. 12 (section 4.3)",
+    "published": "2012",
+    "requirements": [
+     {
+      "id": "req-hydraulic-modelling",
+      "why": "Hydraulic modelling of catchments",
+      "decisive": true
+     },
+     {
+      "id": "req-drainage-capacity-known",
+      "why": "Mapped drainage capacity",
+      "decisive": false
+     }
+    ],
+    "signals": [
+     {
+      "variable": "PRECTOTCORR",
+      "direction": "increase",
+      "note": "Monthly mean precipitation cannot resolve cloudburst or flood-peak intensity; context only."
+     }
+    ],
+    "overlay_note": "Requirement mapping and 'decisive' flags are analyst judgements linking the documented prerequisites to generic concepts; they are not claims made by the source."
+   },
+   {
+    "id": "int-cph-legislation",
+    "title": "Proposed legislative amendments so that roads can be financed and used as flood ways",
+    "category": "governance / financing",
+    "objective": "Amend Danish rules on waste-water payment and the Planning Act so that utility charge revenues can finance roads used to convey pluvial flood water.",
+    "status": "proposed",
+    "prerequisites": [
+     "legal basis for utilities to finance surface flood routes",
+     "coordination between the city, utilities and national ministries"
+    ],
+    "scale": "city",
+    "time_horizon": null,
+    "constraints": [
+     "Existing legislation obstructs using roads as flood ways because utilities may only finance waste-water projects (p. 17)."
+    ],
+    "reported_outcome": null,
+    "outcome_type": "none",
+    "limitations": [
+     "The plan says present environment and waste-water legislation does not provide sufficiently for handling increasing pluvial flood water (p. 17); Climate-ADAPT repeats this under Legal aspects."
+    ],
+    "source_id": "src-cph-plan2012",
+    "locator": "p. 17, section 6.1 Proposal for amendments",
+    "published": "2012",
+    "requirements": [
+     {
+      "id": "req-flood-route-legal-basis",
+      "why": "Legal basis for utilities to finance surface flood routes",
+      "decisive": true
+     }
+    ],
+    "signals": [],
+    "overlay_note": "Requirement mapping and 'decisive' flags are analyst judgements linking the documented prerequisites to generic concepts; they are not claims made by the source."
+   }
+  ],
+  "display_name": "Copenhagen 2011",
+  "event_name": "Copenhagen cloudburst, 2 July 2011"
+ },
+ {
+  "id": "brisbane-2011",
+  "event_start": "2011-01-10",
+  "event_end": "2011-01-19",
+  "date_note": "Dates are the period of Bureau of Meteorology flood warnings for Brisbane (10-19 January 2011). The Brisbane gauge peaked at 3:00am on 13 January 2011. The wider Queensland flooding began in late November 2010.",
+  "event_point": {
+   "lon": 153.03,
+   "lat": -27.47,
+   "label": "city reference point (Brisbane CBD), approximate location of the Brisbane City gauge area, not exact gauge coordinates"
+  },
+  "hazard_mechanism": "riverine_catchment_flood",
+  "summary": "Heavy and very intense rainfall over southeast Queensland in the second week of January 2011 caused major river flooding in the Brisbane and Bremer Rivers. The Brisbane gauge peaked at 4.46 metres at 3:00am on 13 January 2011, the largest peak since January 1974 (5.45 metres). Inflows into Somerset and Wivenhoe dams were nearly double those of 1974, and a Queensland Floods Commission of Inquiry was announced on 17 January.",
+  "sources": [
+   {
+    "id": "src-bri-bom",
+    "url": "https://www.bom.gov.au/qld/flood/fld_history/brisbane_history.shtml",
+    "publisher": "Australian Government Bureau of Meteorology",
+    "title": "Flood history of Brisbane River / Brisbane metropolitan area",
+    "published": null,
+    "retrieved": "2026-11-15",
+    "locator": "entry 'Jan 2011'",
+    "status": "verified",
+    "note": "WebFetch returned HTTP 403; the page was retrieved with a standard HTTP client and the HTML text was read directly."
+   },
+   {
+    "id": "src-bri-aidr",
+    "url": "https://knowledge.aidr.org.au/resources/flood-queensland-2010-2011/",
+    "publisher": "Australian Institute for Disaster Resilience (Australian Disaster Resilience Knowledge Hub)",
+    "title": "Flood - Queensland, 2010-2011",
+    "published": null,
+    "retrieved": "2026-11-15",
+    "locator": "event description; quick statistics; Commission of Inquiry section",
+    "status": "verified"
+   },
+   {
+    "id": "src-bri-qfci-final",
+    "url": "https://knowledge.aidr.org.au/media/3456/qfci-final-report-march-2012.pdf",
+    "publisher": "Queensland Floods Commission of Inquiry",
+    "title": "Queensland Floods Commission of Inquiry Final Report (March 2012)",
+    "published": "2012-03",
+    "retrieved": "2026-11-15",
+    "locator": null,
+    "status": "unavailable",
+    "note": "The PDF (12.5 MB) was downloaded, but its embedded fonts use custom encodings and the text could not be extracted with the tools in this session. No claims are taken from it directly; recommendation texts below come from the official Queensland Government implementation update."
+   },
+   {
+    "id": "src-bri-qfci-site",
+    "url": "http://www.floodcommission.qld.gov.au/publications/final-report/",
+    "publisher": "Queensland Floods Commission of Inquiry",
+    "title": "Final report page",
+    "published": null,
+    "retrieved": "2026-11-15",
+    "locator": null,
+    "status": "unavailable",
+    "note": "Connection refused."
+   },
+   {
+    "id": "src-bri-qldgov-2013",
+    "url": "https://www.premiers.qld.gov.au/publications/categories/reports/assets/govt-response-flood-commission.doc",
+    "publisher": "Queensland Government (Department of the Premier and Cabinet)",
+    "title": "Queensland Floods Commission of Inquiry Final Report implementation update, August 2013",
+    "published": "2013-08",
+    "retrieved": "2026-11-15",
+    "locator": "Introduction; recommendation table (recs 2.2, 2.16, 8.7, 16.x, 17.3); Dam operations section",
+    "status": "verified",
+    "note": "This official government document quotes the Commission's recommendation texts verbatim alongside the government's implementation status."
+   }
+  ],
+  "event_facts": [
+   {
+    "claim": "An exceptional rain event in the second week of January 2011 caused extreme flash flooding in Toowoomba and the Lockyer Valley and major river flooding in the Brisbane and Bremer Rivers.",
+    "source_id": "src-bri-bom",
+    "locator": "entry 'Jan 2011'",
+    "excerpt": "causing extreme flash flooding in Toowoomba and the Lockyer Valley and major river flooding in the Brisbane and Bremer Rivers."
+   },
+   {
+    "claim": "The Brisbane gauge peaked at 4.46 m (6th highest on record) at 3:00am on 13 January 2011, the largest since January 1974 (5.45 m).",
+    "source_id": "src-bri-bom",
+    "locator": "entry 'Jan 2011', Brisbane paragraph",
+    "excerpt": "A major flood peak of 4.46 metres (6th highest) was recorded at 3:00am on Thursday the 13th of January 2011."
+   },
+   {
+    "claim": "Brisbane flood warnings ran from the early hours of 10 January until the final warning on 19 January.",
+    "source_id": "src-bri-bom",
+    "locator": "entry 'Jan 2011', Brisbane paragraph",
+    "excerpt": "Flood warnings forecasting for Brisbane began in the early hours of the 10th of January and continued until the final warning was issued on the 19th of January."
+   },
+   {
+    "claim": "Rainfall above 1000 mm fell in the Brisbane River catchment over December and January, mostly in the 96 hours to 9am on 13 January.",
+    "source_id": "src-bri-bom",
+    "locator": "entry 'Jan 2011'",
+    "excerpt": "Rainfalls in excess of 1000mm were recorded in the Brisbane River catchment during December and January"
+   },
+   {
+    "claim": "Inflows into Somerset and Wivenhoe dams were nearly double those of 1974.",
+    "source_id": "src-bri-bom",
+    "locator": "entry 'Jan 2011'",
+    "excerpt": "Inflows into Somerset and Wivenhoe Dam's were nearly double those of 1974 and can be compared to the 1893 flood event."
+   },
+   {
+    "claim": "BoM states that 35 people died from flooding across Queensland in December 2010 and January 2011 (Queensland-wide, not Brisbane only).",
+    "source_id": "src-bri-bom",
+    "locator": "entry 'Jan 2011'",
+    "excerpt": "35 people lost their lives as a result of flooding throughout Queensland during December 2010 and January 2011."
+   },
+   {
+    "claim": "AIDR gives a different Queensland-wide death toll of 33 for the 2010-2011 floods.",
+    "source_id": "src-bri-aidr",
+    "locator": "event description",
+    "excerpt": "In total, 33 people lost their lives, with three bodies never recovered."
+   },
+   {
+    "claim": "A judicial inquiry's final report was published in March 2012.",
+    "source_id": "src-bri-aidr",
+    "locator": "Commission of Inquiry section",
+    "excerpt": "The final report of a judicial inquiry into the event was published in March 2012."
+   },
+   {
+    "claim": "The Queensland Government released its response in June 2012 and supported all of the final report's recommendations.",
+    "source_id": "src-bri-qldgov-2013",
+    "locator": "Introduction",
+    "excerpt": "The government's response supported all of the final report's recommendations"
+   }
+  ],
+  "interventions": [
+   {
+    "id": "int-bri-catchment-flood-study",
+    "title": "Comprehensive Brisbane River catchment flood study (QFCI recommendation 2.2)",
+    "category": "flood risk information / catchment modelling",
+    "objective": "Complete a flood study of the Brisbane River catchment that uses several methods, includes data on Wivenhoe and Somerset dam operations, and runs hydrologic models in a Monte Carlo framework.",
+    "status": "retrospective_recommendation",
+    "prerequisites": [
+     "rainfall, stream-flow, tide and inundation records",
+     "dam operation data",
+     "topography and river bathymetry",
+     "multi-agency collaboration (state and councils)"
+    ],
+    "scale": "catchment",
+    "time_horizon": "'as soon as practicable' (per recommendation text)",
+    "constraints": [],
+    "reported_outcome": null,
+    "outcome_type": "none",
+    "limitations": [],
+    "source_id": "src-bri-qldgov-2013",
+    "locator": "recommendation 2.2 (implementation update table)",
+    "published": "2013-08",
+    "requirements": [
+     {
+      "id": "req-catchment-governance",
+      "why": "Multi-agency collaboration across the catchment",
+      "decisive": true
+     },
+     {
+      "id": "req-flood-gauge-network",
+      "why": "Rainfall, stream-flow and tide records",
+      "decisive": false
+     },
+     {
+      "id": "req-hydraulic-modelling",
+      "why": "Catchment hydrologic models",
+      "decisive": false
+     }
+    ],
+    "signals": [
+     {
+      "variable": "PRECTOTCORR",
+      "direction": "increase",
+      "note": "Monthly mean precipitation cannot resolve cloudburst or flood-peak intensity; context only."
+     }
+    ],
+    "overlay_note": "Requirement mapping and 'decisive' flags are analyst judgements linking the documented prerequisites to generic concepts; they are not claims made by the source."
+   },
+   {
+    "id": "int-bri-dam-operations",
+    "title": "Re-examine Wivenhoe, Somerset and North Pine dam operating strategies across a range of options (QFCI recommendation 17.3; Dam Optimisation Studies)",
+    "category": "dam operations / flood mitigation",
+    "objective": "Give the government a wide range of operating-strategy options with different priorities, evaluated over a range of floods for urban and rural inundation, water supply security, dam safety and other impacts.",
+    "status": "retrospective_recommendation",
+    "status_note": "The August 2013 update lists the government response as 'Ongoing'. Stage one of the Wivenhoe and Somerset Dam Optimisation Study was due for government consideration by early 2014.",
+    "prerequisites": [
+     "multi-purpose reservoir with flood storage",
+     "flood operations manual",
+     "catchment hydrologic models",
+     "explicit trade-off between flood mitigation and water supply security"
+    ],
+    "scale": "catchment",
+    "time_horizon": "staged optimisation studies (stage one due early 2014)",
+    "constraints": [
+     "The update says dam optimisation must balance flood mitigation benefits against water supply security, social and environmental impacts."
+    ],
+    "reported_outcome": "The update reports that an independent review of Seqwater's January 2011 flood event report by the US Bureau of Reclamation and US Army Corps of Engineers (22 September 2012) found operational decisions were prudent but raised issues for consideration.",
+    "outcome_type": "none",
+    "limitations": [
+     "Recommendations 16.1-16.4 concern the preparation and review of flood event reports after January 2011, including a referral to the Crime and Misconduct Commission (16.1). This record does not characterise the Commission's findings on dam operation because the final report text could not be extracted."
+    ],
+    "source_id": "src-bri-qldgov-2013",
+    "locator": "recommendation 17.3; recommendations 16.1-16.4; section 'Dam operations'",
+    "published": "2013-08",
+    "requirements": [
+     {
+      "id": "req-flood-dam-storage",
+      "why": "Multi-purpose reservoir with flood storage",
+      "decisive": true
+     },
+     {
+      "id": "req-catchment-governance",
+      "why": "Authority over upstream dam operations",
+      "decisive": true
+     }
+    ],
+    "signals": [],
+    "overlay_note": "Requirement mapping and 'decisive' flags are analyst judgements linking the documented prerequisites to generic concepts; they are not claims made by the source."
+   },
+   {
+    "id": "int-bri-flood-mapping-public",
+    "title": "Publish flood mapping online and do not rely on evacuation plans alone to approve flood-prone development (QFCI recommendations 2.16 and 8.7)",
+    "category": "land-use planning / risk communication",
+    "objective": "Councils and the state display all flood mapping they commission or adopt on their websites, and councils do not approve development on flood-prone land with an evacuation-plan condition as the only basis.",
+    "status": "implemented",
+    "status_note": "Implemented applies to 2.16 only: the government reports the Queensland Flood Portal launched on 28 September 2012 as an updated version of FloodCheck. Recommendation 8.7 is a recommendation to councils; the update gives no outcome for it.",
+    "prerequisites": [
+     "flood studies and mapping available",
+     "public web mapping platform",
+     "planning schemes that refer to flood mapping"
+    ],
+    "scale": "regional",
+    "time_horizon": null,
+    "constraints": [],
+    "reported_outcome": "Queensland Flood Portal launched 28 September 2012 (implementation update).",
+    "outcome_type": "observed",
+    "limitations": [],
+    "source_id": "src-bri-qldgov-2013",
+    "locator": "recommendations 2.16 and 8.7 (implementation update table)",
+    "published": "2013-08",
+    "requirements": [
+     {
+      "id": "req-flood-hazard-mapping",
+      "why": "Flood studies and mapping available",
+      "decisive": true
+     },
+     {
+      "id": "req-public-communication",
+      "why": "Public web platform and outreach",
+      "decisive": false
+     }
+    ],
+    "signals": [],
+    "overlay_note": "Requirement mapping and 'decisive' flags are analyst judgements linking the documented prerequisites to generic concepts; they are not claims made by the source."
+   }
+  ],
+  "display_name": "Brisbane 2011",
+  "event_name": "Brisbane River flood, January 2011"
+ },
+ {
+  "id": "camp-fire-2018",
+  "event_start": "2018-11-08",
+  "event_end": "2018-11-25",
+  "date_note": "Ignition about 06:20 on 8 November 2018; declared 100% contained on 25 November 2018 (NIST TN 2252 p. 4).",
+  "event_point": {
+   "lon": -121.61,
+   "lat": 39.76,
+   "label": "city reference point (Paradise, CA), not the ignition point (the fire started near Pulga, Feather River Canyon)"
+  },
+  "hazard_mechanism": "wui_wildfire",
+  "summary": "The Camp Fire ignited at about 06:20 on 8 November 2018 near Camp Creek Road and Pulga Road in Butte County, California, and quickly reached the communities of Concow, Paradise and Magalia, triggering the evacuation of about 40,000 people. NIST reports 85 fatalities and more than 18,000 destroyed structures. Road closures and fire exposure complicated evacuation, and first responders set up 31 temporary refuge areas involving more than 1,200 civilians.",
+  "sources": [
+   {
+    "id": "src-cf-nist-pub",
+    "url": "https://www.nist.gov/publications/case-study-camp-fire-notification-evacuation-traffic-and-temporary-refuge-areas-nettra",
+    "publisher": "National Institute of Standards and Technology (NIST)",
+    "title": "A Case Study of the Camp Fire - Notification, Evacuation, Traffic, and Temporary Refuge Areas (NETTRA), NIST TN 2252",
+    "published": "2023-07-18",
+    "retrieved": "2026-11-15",
+    "locator": "publication abstract",
+    "status": "verified"
+   },
+   {
+    "id": "src-cf-nist-life",
+    "url": "https://www.nist.gov/programs-projects/wildland-urban-interface-wui-fire-data-collection-parcel-vulnerabilities/nist/life",
+    "publisher": "National Institute of Standards and Technology (NIST)",
+    "title": "Life Safety During the Camp Fire",
+    "published": null,
+    "retrieved": "2026-11-15",
+    "locator": "project page text",
+    "status": "verified"
+   },
+   {
+    "id": "src-cf-nist-tn2252",
+    "url": "https://nvlpubs.nist.gov/nistpubs/TechnicalNotes/NIST.TN.2252.pdf",
+    "publisher": "National Institute of Standards and Technology (NIST)",
+    "title": "NIST Technical Note 2252: A Case Study of the Camp Fire - NETTRA",
+    "published": "2023-07",
+    "retrieved": "2026-11-15",
+    "locator": "printed page numbers from 'NIST TN 2252 July 2023 <page>' headers",
+    "status": "verified",
+    "note": "Text extracted from the downloaded PDF; some glyphs needed a fixed character-offset decoding."
+   }
+  ],
+  "event_facts": [
+   {
+    "claim": "The fire started near Camp Creek Road and Pulga Road in Butte County at about 06:20 on 8 November 2018.",
+    "source_id": "src-cf-nist-tn2252",
+    "locator": "p. 2, section 1.2 The Camp Fire",
+    "excerpt": "in the Feather River Canyon north of Jarbo Gap, at approximately 06:20 on November 8, 2018."
+   },
+   {
+    "claim": "The fire burned for 18 days and was declared 100% contained on 25 November 2018.",
+    "source_id": "src-cf-nist-tn2252",
+    "locator": "p. 4, section 1.2",
+    "excerpt": "The fire burned for 18 days before being declared 100% contained on November 25, 2018."
+   },
+   {
+    "claim": "The fire caused 85 fatalities and destroyed more than 18,000 structures, and about 40,000 people were evacuated.",
+    "source_id": "src-cf-nist-tn2252",
+    "locator": "Abstract",
+    "excerpt": "resulting in 85 fatalities and more than 18 000 destroyed structures."
+   },
+   {
+    "claim": "Two or more of the four egress arteries from Paradise were closed at the same time for 68% of the period 08:00-14:15.",
+    "source_id": "src-cf-nist-tn2252",
+    "locator": "p. 120 (also repeated in findings summary, p. 228)",
+    "excerpt": "Two or more of the four egress arteries leaving Paradise were simultaneously closed due to fire for 68 % of the time between 08:00 and 14:15."
+   },
+   {
+    "claim": "In the early phase, the fire was ahead of notifications (about 06:30-07:30); notifications were roughly simultaneous with the fire's arrival from 07:30 to 08:40, and ahead of the fire after 08:40.",
+    "source_id": "src-cf-nist-tn2252",
+    "locator": "p. 69, section 6 Emergency Notifications",
+    "excerpt": "Notifications were approximately simultaneous with the arrival of fire"
+   },
+   {
+    "claim": "Routes that took 25 minutes in normal traffic took several hours, if passable at all, and many people were trapped without a safe egress route.",
+    "source_id": "src-cf-nist-life",
+    "locator": "project page, evacuation and traffic text",
+    "excerpt": "Routes that took twenty-five minutes in normal traffic took several hours, if they were passable at all."
+   },
+   {
+    "claim": "31 temporary refuge areas were implemented, involving more than 1,200 civilians, and 198 evacuation assistance or rescue events involved at least 1,000 civilians.",
+    "source_id": "src-cf-nist-pub",
+    "locator": "Abstract",
+    "excerpt": "A total of 31 temporary refuge areas were implemented during the incident, involving more than 1200 civilians."
+   },
+   {
+    "claim": "NIST defines TRAs as immediately available areas giving temporary shelter and reduced exposure; first responders set them up reactively.",
+    "source_id": "src-cf-nist-life",
+    "locator": "project page, TRA text",
+    "excerpt": "immediately available areas providing temporary shelter and reduced exposures"
+   },
+   {
+    "claim": "The Paradise evacuation plan was designed for a zoned/partial evacuation, not a complete simultaneous evacuation of the town.",
+    "source_id": "src-cf-nist-tn2252",
+    "locator": "p. 225, section 14.1, TF-EP 3",
+    "excerpt": "The Paradise evacuation plan was conceived and designed for a zoned/partial evacuation; it was not designed for a complete simultaneous evacuation of the town."
+   }
+  ],
+  "interventions": [
+   {
+    "id": "int-cf-evacuation-planning",
+    "title": "Collaborative evacuation planning with realistic, repeated training exercises (NIST R-EP 1 to R-EP 4)",
+    "category": "evacuation planning",
+    "objective": "Develop evacuation plans with nearby first responder agencies, test them in realistic exercises that include fire, rescue, evacuation and traffic, and revise them using lessons from exercises and other WUI fires.",
+    "status": "retrospective_recommendation",
+    "prerequisites": [
+     "multi-agency coordination (fire, law enforcement, public works)",
+     "defined evacuation zones and routes",
+     "regular exercise programme"
+    ],
+    "scale": "city",
+    "time_horizon": null,
+    "constraints": [],
+    "reported_outcome": "Observed in the Camp Fire: an evacuation plan was in place and communicated before the incident (TF-EP 1), but it was designed for zoned/partial evacuation, not a complete simultaneous evacuation (TF-EP 3).",
+    "outcome_type": "observed",
+    "limitations": [
+     "The plan assumed zoned/partial evacuation; the event required a near-simultaneous town-wide evacuation (TF-EP 3).",
+     "Egress arteries were closed by fire for long periods (68% of 08:00-14:15 had two or more of four arteries closed), limiting route-based evacuation."
+    ],
+    "source_id": "src-cf-nist-tn2252",
+    "locator": "p. 225, section 14.1 (TF-EP 1, TF-EP 3, R-EP 1 to R-EP 4); also p. 40",
+    "published": "2023-07",
+    "requirements": [
+     {
+      "id": "req-wui-exposure",
+      "why": "Community adjacent to wildland fuels",
+      "decisive": true
+     },
+     {
+      "id": "req-evacuation-route-capacity",
+      "why": "Defined evacuation zones, routes and capacity",
+      "decisive": true
+     }
+    ],
+    "signals": [
+     {
+      "variable": "T2M",
+      "direction": "increase",
+      "note": "Regional warming is fire-weather context, not fuel or ignition evidence."
+     }
+    ],
+    "overlay_note": "Requirement mapping and 'decisive' flags are analyst judgements linking the documented prerequisites to generic concepts; they are not claims made by the source."
+   },
+   {
+    "id": "int-cf-notification",
+    "title": "Resilient, multi-modal emergency notification system that accounts for the time needed to pass information along (NIST R-N 1 to R-N 3)",
+    "category": "warning systems",
+    "objective": "Maintain a notification plan and a system that keeps working when electricity, internet or infrastructure fail and uses several channels (phones, IPAWS, internet, social media, radio, sirens), and design plans around the minimum time for assessment and information transfer.",
+    "status": "retrospective_recommendation",
+    "prerequisites": [
+     "multiple alerting channels with backup power",
+     "defined information flow from incident command to law enforcement to the public",
+     "official social media channels that are kept updated"
+    ],
+    "scale": "city",
+    "time_horizon": null,
+    "constraints": [],
+    "reported_outcome": "Observed: during about 06:30-07:30 the fire was ahead of notifications; notifications became roughly simultaneous with or ahead of the fire only later (p. 69).",
+    "outcome_type": "observed",
+    "limitations": [
+     "NIST notes that rapid fire progression and an origin close to a community may reduce the time available for notification and evacuation (R-N 4)."
+    ],
+    "source_id": "src-cf-nist-tn2252",
+    "locator": "p. 71 and p. 227, R-N 1 to R-N 4; p. 69",
+    "published": "2023-07",
+    "requirements": [
+     {
+      "id": "req-wui-exposure",
+      "why": "Community exposed to fast-moving wildfire",
+      "decisive": true
+     },
+     {
+      "id": "req-multichannel-alerting",
+      "why": "Multiple alerting channels with backup power",
+      "decisive": false
+     }
+    ],
+    "signals": [],
+    "overlay_note": "Requirement mapping and 'decisive' flags are analyst judgements linking the documented prerequisites to generic concepts; they are not claims made by the source."
+   },
+   {
+    "id": "int-cf-safety-zones",
+    "title": "Pre-planned, distributed wildfire safety zone system (NIST R-TRA 1 to R-TRA 7)",
+    "category": "life-safety planning (shelter-in-community fallback)",
+    "objective": "When timely evacuation is not possible, give civilians reachable pre-planned wildfire safety zones whose number, size, distribution, access and maintenance account for fire exposure, fuel loads and population.",
+    "status": "retrospective_recommendation",
+    "prerequisites": [
+     "candidate open areas of adequate size (e.g. large parking lots, gravel areas, irrigated parks)",
+     "fuel management around candidate sites",
+     "access pathways that avoid likely burnover locations",
+     "ongoing maintenance"
+    ],
+    "scale": "neighbourhood",
+    "time_horizon": null,
+    "constraints": [
+     "NIST notes the difficulty of reaching the Camelot Meadow Wild Fire Safety Zone and the need to place and maintain safety zones carefully (R-TRA 6)."
+    ],
+    "reported_outcome": "Observed during the incident: 31 ad hoc temporary refuge areas involving more than 1,200 civilians; consolidating TRAs and groups of civilians made management and evacuation easier (TF-TRA 12).",
+    "outcome_type": "observed",
+    "limitations": [
+     "NIST states that ad hoc TRAs are by default a last resort and do not give the full benefit of a pre-planned system (p. 173/230). The TRAs used in the Camp Fire were improvised, not designated safe destinations.",
+     "This record does not treat TRAs as safe routing targets; NIST frames them as an emergency fallback when evacuation is not possible."
+    ],
+    "source_id": "src-cf-nist-tn2252",
+    "locator": "pp. 173-174 and p. 230 (TF-TRA 12, R-TRA 1 to R-TRA 7)",
+    "published": "2023-07",
+    "requirements": [
+     {
+      "id": "req-wui-exposure",
+      "why": "Community adjacent to wildland fuels",
+      "decisive": true
+     },
+     {
+      "id": "req-safety-zone-sites",
+      "why": "Candidate open areas of adequate size",
+      "decisive": true
+     }
+    ],
+    "signals": [
+     {
+      "variable": "RH2M",
+      "direction": "decrease",
+      "note": "Lower humidity is fire-weather context only."
+     }
+    ],
+    "overlay_note": "Requirement mapping and 'decisive' flags are analyst judgements linking the documented prerequisites to generic concepts; they are not claims made by the source."
+   }
+  ],
+  "display_name": "Camp Fire 2018",
+  "event_name": "Camp Fire, Butte County, November 2018"
+ },
+ {
+  "id": "cape-town-2015-2018",
+  "event_start": "2015-01-01",
+  "event_end": "2018-12-31",
+  "date_note": "Year-level precision only; the day and month are placeholders. The Water Strategy describes the drought as 2015 to 2017; the broader crisis period, including the 2018 Day Zero threat and restrictions/tariffs in early 2018, runs into 2018. The sources fetched give no exact start or end date for the crisis.",
+  "drought_period_per_strategy": "2015-2017",
+  "event_point": {
+   "lon": 18.42,
+   "lat": -33.92,
+   "label": "city reference point (Cape Town city centre), not a dam or supply-system location"
+  },
+  "hazard_mechanism": "multiyear_drought",
+  "summary": "The Cape Town Water Strategy describes a severe three-year drought from 2015 to 2017, which it calls a 1-in-590-year event. By March 2018 the supply dams had fallen to about one-fifth full. The city avoided 'Day Zero' by cutting water use by more than 40%, using restrictions, high drought tariffs and pressure management. Council approved a Water Strategy on 30 May 2019, committing to more than 300 million litres per day of new supply over ten years.",
+  "sources": [
+   {
+    "id": "src-ct-media",
+    "url": "https://www.capetown.gov.za/media-and-news/city-s-water-strategy-approved-by-council/",
+    "publisher": "City of Cape Town",
+    "title": "City's Water Strategy approved by Council",
+    "published": "2019-05-30",
+    "retrieved": "2026-11-15",
+    "locator": "media release text",
+    "status": "verified"
+   },
+   {
+    "id": "src-ct-strategy",
+    "url": "https://www.capetown.gov.za/_documents/resource.capetown.gov.za/documentcentre/Documents/City%20strategies,%20plans%20and%20frameworks/Cape%20Town%20Water%20Strategy.pdf",
+    "publisher": "City of Cape Town",
+    "title": "Cape Town's Water Strategy: Our Shared Water Future",
+    "published": null,
+    "retrieved": "2026-11-15",
+    "locator": "section names (printed page numbers could not be reliably mapped from the extracted text)",
+    "status": "verified",
+    "note": "The requested URL (resource.capetown.gov.za) refused connection; this is the same document at the City's capetown.gov.za mirror path. Text was extracted from the PDF. Council approval date (30 May 2019) comes from src-ct-media; the PDF's own publication date was not confirmed."
+   },
+   {
+    "id": "src-ct-strategy-original",
+    "url": "https://resource.capetown.gov.za/documentcentre/Documents/City%20strategies%2C%20plans%20and%20frameworks/Cape%20Town%20Water%20Strategy.pdf",
+    "publisher": "City of Cape Town",
+    "title": "Cape Town Water Strategy (original URL)",
+    "published": null,
+    "retrieved": "2026-11-15",
+    "locator": null,
+    "status": "unavailable",
+    "note": "Connection refused (ECONNREFUSED); see src-ct-strategy for the mirror copy."
+   }
+  ],
+  "event_facts": [
+   {
+    "claim": "The strategy was developed in the context of a severe three-year drought from 2015 to 2017; water use was cut by more than 40% and Day Zero was avoided.",
+    "source_id": "src-ct-strategy",
+    "locator": "Introduction (page after Mayor's foreword)",
+    "excerpt": "the severe three-year drought that Cape Town experienced from 2015 to 2017. Cape Town managed to get through it and avoid Day Zero"
+   },
+   {
+    "claim": "In March 2018, at the height of the drought, the dams supplying the city fell to one-fifth full.",
+    "source_id": "src-ct-strategy",
+    "locator": "Mayor's foreword",
+    "excerpt": "In March 2018, at the height of a three-year drought (the worst on record), the dams supplying the city dropped to one fifth full."
+   },
+   {
+    "claim": "The strategy describes the three-year drought as a 1-in-590-year event based on historical rainfall records.",
+    "source_id": "src-ct-strategy",
+    "locator": "section on security of supply / level of assurance",
+    "excerpt": "The three-year drought in Cape Town was a 1-in-590-year event"
+   },
+   {
+    "claim": "Day Zero would have occurred if total dam storage reached 13.5%, giving 25 litres per person per day for three months.",
+    "source_id": "src-ct-strategy",
+    "locator": "Endnote 1",
+    "excerpt": "Day Zero would have hit if the total dam level in the supply system reached 13,5% of storage capacity."
+   },
+   {
+    "claim": "Water use fell from an average of 980 million litres per day in 2014/15 to just over 500 million litres per day during the drought.",
+    "source_id": "src-ct-strategy",
+    "locator": "FAQ text box 'How much water does Cape Town use'",
+    "excerpt": "During the drought, water use was reduced to just over 500 million litres per day (500 megalitres)."
+   },
+   {
+    "claim": "The City's media release says dam levels turned at about 19% in 2017 and 20% in 2018 before winter rains.",
+    "source_id": "src-ct-media",
+    "locator": "media release text",
+    "excerpt": "In 2017, dam levels turned at approximately 19% prior to winter rainfall, and in 2018, they turned at 20%."
+   },
+   {
+    "claim": "Council approved the Water Strategy on 30 May 2019.",
+    "source_id": "src-ct-media",
+    "locator": "media release text",
+    "excerpt": "Earlier today, 30 May 2019, the City's Water Strategy was approved by Council."
+   }
+  ],
+  "interventions": [
+   {
+    "id": "int-ct-pressure-management",
+    "title": "Network pressure management, leak detection and demand reduction during the crisis",
+    "category": "demand management (implemented during crisis)",
+    "objective": "Reduce water demand and losses by controlling pressure zone by zone with smart controllers, plus leak detection and repairs.",
+    "status": "implemented",
+    "prerequisites": [
+     "a network that can be divided into pressure zones",
+     "smart pressure controllers",
+     "leak detection capacity"
+    ],
+    "scale": "city",
+    "time_horizon": "crisis period (continued under the strategy)",
+    "constraints": [],
+    "reported_outcome": "The strategy reports 102 zones isolated and optimised, saving over 50 million litres per day; together with a large water price increase, pressure management helped cut demand in February 2018 from 600 to 550 million litres per day.",
+    "outcome_type": "observed",
+    "limitations": [
+     "The strategy states aggressive pressure management left some areas without water, sometimes for several hours, increasing complaints."
+    ],
+    "source_id": "src-ct-strategy",
+    "locator": "Commitment 2 (Wise use), 'Effective water network management'; customer service section on complaints",
+    "published": null,
+    "requirements": [
+     {
+      "id": "req-pressure-zoned-network",
+      "why": "Network divisible into pressure zones",
+      "decisive": true
+     },
+     {
+      "id": "req-reservoir-dependence",
+      "why": "Supply-shortfall context (rain-fed reservoirs)",
+      "decisive": false
+     }
+    ],
+    "signals": [
+     {
+      "variable": "PRECTOTCORR",
+      "direction": "decrease",
+      "note": "Regional precipitation is not reservoir inflow or storage."
+     }
+    ],
+    "overlay_note": "Requirement mapping and 'decisive' flags are analyst judgements linking the documented prerequisites to generic concepts; they are not claims made by the source."
+   },
+   {
+    "id": "int-ct-restrictions-tariffs",
+    "title": "Escalating water restrictions and drought tariffs (crisis), then a simplified three-level restriction system (strategy)",
+    "category": "demand management / pricing",
+    "objective": "During the crisis: cut demand with restrictions and steeply higher tariffs. In the strategy: simplify to three restriction levels tied to indicative dam levels (below 80%, 70%, 60%), with an emergency response below 45%.",
+    "status": "implemented",
+    "status_note": "Crisis restrictions and the level-6B tariffs (February 2018) were implemented. The three-level system is a later strategy commitment (proposed).",
+    "prerequisites": [
+     "legal authority to impose restrictions and tariffs",
+     "metering and billing",
+     "public communication",
+     "dam-level monitoring with trigger thresholds"
+    ],
+    "scale": "city",
+    "time_horizon": "crisis 2017-2018; restriction levels reviewed annually under the strategy",
+    "constraints": [
+     "Revenue-neutral tariff policy during restrictions put a financial burden on customers (strategy, 'Rainless day fund?' text box)."
+    ],
+    "reported_outcome": "Under level-6B tariffs from February 2018, the first block of the residential tariff rose more than six-fold to R30/kl. Use by billed residents fell from about 220 to about 120 litres per person per day, nearly 50% (strategy, Commitment 2).",
+    "outcome_type": "observed",
+    "limitations": [
+     "The strategy reports residents found the many restriction levels confusing.",
+     "High bills from drought tariffs contributed to many complaints."
+    ],
+    "source_id": "src-ct-strategy",
+    "locator": "'Water restrictions' section (Table 3); 'A Rainless day fund?' text box; Commitment 2 pricing text",
+    "published": null,
+    "requirements": [
+     {
+      "id": "req-restriction-authority",
+      "why": "Legal authority for restrictions and tariffs",
+      "decisive": true
+     },
+     {
+      "id": "req-household-metering",
+      "why": "Metering and billing",
+      "decisive": true
+     },
+     {
+      "id": "req-public-communication",
+      "why": "Public communication capacity",
+      "decisive": false
+     },
+     {
+      "id": "req-reservoir-dependence",
+      "why": "Dam-level monitoring with trigger thresholds",
+      "decisive": false
+     }
+    ],
+    "signals": [
+     {
+      "variable": "PRECTOTCORR",
+      "direction": "decrease",
+      "note": "Regional precipitation is not reservoir inflow or storage."
+     }
+    ],
+    "overlay_note": "Requirement mapping and 'decisive' flags are analyst judgements linking the documented prerequisites to generic concepts; they are not claims made by the source."
+   },
+   {
+    "id": "int-ct-new-supply-programme",
+    "title": "Water Strategy commitment: more than 300 million litres per day of new diverse supply over ten years at a 99.5% reliability standard",
+    "category": "supply diversification (later strategy commitment, not a crisis action)",
+    "objective": "Cost-effectively add groundwater, water reuse and desalination capacity to raise resilience and reduce the likelihood of severe restrictions, planning to 99.5% rather than 98% reliability.",
+    "status": "proposed",
+    "prerequisites": [
+     "groundwater and reuse resource assessments",
+     "desalination siting and environmental impact assessment",
+     "capital financing",
+     "scenario planning with annual reviews"
+    ],
+    "scale": "city",
+    "time_horizon": "10 years from strategy approval (2019); vision of a water-sensitive city by 2040",
+    "constraints": [
+     "A full environmental impact assessment is required before large-scale desalination.",
+     "The strategy says Cape Town will continue to rely on rain-fed dams for most of its water, so restrictions may still be needed in droughts."
+    ],
+    "reported_outcome": "Committed: more than 300 million litres per day over ten years at about R5,4 billion (2018 terms), plus about 70 million litres per day of demand-management savings. These are plan commitments, not results.",
+    "outcome_type": "projected",
+    "limitations": [
+     "If 2015-2017 rainfall became the permanent norm, the strategy says the planned programme would meet only basic water needs and significant restrictions would remain until augmentation exceeds demand growth."
+    ],
+    "source_id": "src-ct-strategy",
+    "locator": "Commitment 3 (Sufficient, reliable water from diverse sources); 'Committed programme'; stress-test scenarios section",
+    "published": "2019-05-30 (Council approval date per src-ct-media)",
+    "requirements": [
+     {
+      "id": "req-alternative-sources",
+      "why": "Groundwater, reuse or desalination resources",
+      "decisive": true
+     },
+     {
+      "id": "req-long-term-capital-funding",
+      "why": "Capital financing",
+      "decisive": false
+     }
+    ],
+    "signals": [
+     {
+      "variable": "PRECTOTCORR",
+      "direction": "decrease",
+      "note": "Regional precipitation is not reservoir inflow or storage."
+     }
+    ],
+    "overlay_note": "Requirement mapping and 'decisive' flags are analyst judgements linking the documented prerequisites to generic concepts; they are not claims made by the source."
+   }
+  ],
+  "display_name": "Cape Town 2015–2018",
+  "event_name": "Cape Town water crisis, 2015–2018"
+ }
+]
