@@ -32,9 +32,12 @@ HEAVY_LIMIT = 30
 
 @app.middleware("http")
 async def rate_limit_mw(request: Request, call_next):
-    public_ip = request.headers.get("cf-connecting-ip") or request.headers.get("x-forwarded-for")
+    xff = request.headers.get("x-forwarded-for")
+    # cf-connecting-ip is set by Cloudflare; otherwise use the right-most X-Forwarded-For entry (appended by the
+    # hosting proxy), which a client cannot spoof by sending its own header.
+    public_ip = request.headers.get("cf-connecting-ip") or (xff.split(",")[-1].strip() if xff else None)
     if request.url.path.startswith("/api/") and public_ip:  # limit only traffic arriving through a public proxy
-        ip = public_ip.split(",")[0].strip()
+        ip = public_ip
         heavy = request.method == "POST" or any(h in request.url.path for h in HEAVY)
         key = ip + ("|heavy" if heavy else "")
         now = _time.time()

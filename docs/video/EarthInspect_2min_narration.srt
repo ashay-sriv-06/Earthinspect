@@ -1,0 +1,71 @@
+1
+00:00:00,500 --> 00:00:07,000
+This is EarthInspect. It connects environmental observations, lessons from past disasters,
+
+2
+00:00:07,000 --> 00:00:14,500
+and the evidence behind every conclusion. Here's a retrospective look at the 2018 Camp Fire in California.
+
+3
+00:00:15,000 --> 00:00:21,000
+These are real NASA satellite images of the same area. On the left, November eighth, 2018.
+
+4
+00:00:21,000 --> 00:00:28,500
+On the right, October twenty-fifth. As I move the divider, you can see a large plume on the event day
+
+5
+00:00:28,500 --> 00:00:34,500
+that isn't there two weeks earlier. This is a visual comparison only.
+
+6
+00:00:35,000 --> 00:00:42,000
+Underneath is long-term context. From 2001 to 2024, regional temperature rose 0.475 degrees Celsius per decade,
+
+7
+00:00:42,000 --> 00:00:48,000
+with a 95 percent interval from 0.144 to 0.807.
+
+8
+00:00:48,000 --> 00:00:54,500
+That's a regional trend, separate from the event imagery, and not the cause of this fire.
+
+9
+00:00:55,000 --> 00:01:02,000
+Next, planning lessons. This response, a multi-channel emergency notification system,
+
+10
+00:01:02,000 --> 00:01:08,000
+comes from NIST's investigation of the fire.
+
+11
+00:01:08,000 --> 00:01:14,000
+Trace it, and each link is visible: the NIST report, what it observed, and what we still don't know.
+
+12
+00:01:14,000 --> 00:01:19,500
+Some conditions are our own analyst mappings, and the app labels them that way.
+
+13
+00:01:20,000 --> 00:01:27,000
+Now I'll add one planning assumption: the community borders wildland fuels.
+
+14
+00:01:27,000 --> 00:01:33,500
+It's saved as an assumption, not a fact. Under it, notification becomes a candidate lead,
+
+15
+00:01:33,500 --> 00:01:39,000
+and the app marks that as conditional. Evacuation planning still needs local evidence about route capacity.
+
+16
+00:01:39,000 --> 00:01:44,500
+The two can work together. Neither replaces the other.
+
+17
+00:01:45,000 --> 00:01:52,000
+Everything is saved and exportable. What you get is a planning lead you can inspect:
+
+18
+00:01:52,000 --> 00:01:59,500
+the evidence behind it, its limits, and the assumptions it depends on.

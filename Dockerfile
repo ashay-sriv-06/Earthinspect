@@ -18,4 +18,5 @@ ENV EARTHINSPECT_DATA_DIR=/data \
     EARTHINSPECT_FRONTEND_DIST=/app/frontend_dist
 VOLUME ["/data"]
 EXPOSE 8000
-CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Hosts such as Render inject $PORT; default to 8000 locally.
+CMD ["sh", "-c", "python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]

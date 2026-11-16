@@ -1,0 +1,8 @@
+  0.05s  start screen
+  7.49s  open investigation clicked
+ 15.02s  swipe
+ 35.02s  measure
+ 55.00s  trace
+ 80.01s  revise
+105.01s  report
+120.01s  end
