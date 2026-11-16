@@ -34,7 +34,12 @@ export interface Investigation {
   id: string; title: string; current_revision_id: string
   config: {
     place: Place; question: string; variables: string[]; period: { start: string; end: string }
-    view: { center: [number, number]; zoom: number; layers: Record<string, any>; imagery_date: string | null; inspector_tab: string; selected_variable?: string }
+    view: {
+      center: [number, number]; zoom: number; layers: Record<string, any>; imagery_date: string | null; inspector_tab: string; selected_variable?: string
+      imagery_date_b?: string | null; imagery_mix?: number; selected_node?: string | null; evidence_trail?: string[]
+      last_change?: { from: string; to: string } | null
+    }
+    current_batch?: string
   }
   state: { mechanism: string | null; scale: string | null; requirements: Record<string, ReqState>; disputed: string[] }
   revisions: Revision[]

@@ -78,14 +78,18 @@ export default function App() {
   const openInv = async (id: string, fly = true) => {
     try {
       const i = await api.get<Investigation>(`/api/investigations/${id}`)
-      setInv(i); setPreview(null); setMatch(null); setNodeId(null); setAcqEvents([]); setFocus(null)
+      setInv(i); setPreview(null); setMatch(null); setAcqEvents([]); setFocus(null)
+      setNodeId(i.config.view.selected_node || null); setTrail(i.config.view.evidence_trail || [])
       setSelVar(i.config.view.selected_variable || null)
       setTab((i.config.view.inspector_tab as Tab) || 'analysis')
       try { localStorage.setItem('ei_last_inv', id) } catch { /* ignore */ }
       history.replaceState(null, '', `?inv=${id}`)
       if (fly) setFlyKey(id + Date.now())
+      setChange(null)
       const r = await loadResults(id)
       if (r.batch) api.get<MatchRun>(`/api/investigations/${id}/match`).then(setMatch).catch(() => {})
+      const lc = i.config.view.last_change
+      if (lc && i.revisions.some(x => x.id === lc.from) && lc.to === i.current_revision_id) loadChange(id, lc.from, lc.to)
     } catch (e) { fail(e) }
   }
 
@@ -141,20 +145,41 @@ export default function App() {
     setBusy('match')
     try { setMatch(await api.get<MatchRun>(`/api/investigations/${inv.id}/match`)) } catch (e) { fail(e) } finally { setBusy(null) }
   }
+  const [change, setChange] = useState<any>(null)
+  const loadChange = async (id: string, from: string, to: string) => {
+    try { setChange(await api.get(`/api/investigations/${id}/what-changed?frm=${from}&to=${to}`)) } catch { setChange(null) }
+  }
   const revise = async (body: any) => {
     if (!inv) return
+    const before = inv.current_revision_id
     try {
       const i = await api.post<Investigation>(`/api/investigations/${inv.id}/revisions`, body)
-      setInv(i)
       setMatch(await api.get<MatchRun>(`/api/investigations/${inv.id}/match`))
+      await loadChange(inv.id, before, i.current_revision_id)
+      const view = { ...i.config.view, ...inv.config.view, last_change: { from: before, to: i.current_revision_id } }
+      setInv({ ...i, config: { ...i.config, view } })
+      if (viewTimer.current) window.clearTimeout(viewTimer.current)
+      api.patch(`/api/investigations/${inv.id}`, { view }).catch(() => {})
       say(`Revision R${i.revisions[i.revisions.length - 1].seq} saved; dependent match re-evaluated (NASA artifacts reused).`)
     } catch (e) { fail(e) }
   }
+  const changedNodes = useMemo(() => {
+    if (!change || !traceId) return [] as string[]
+    const c = change.candidates.find((x: any) => x.intervention_id === traceId)
+    const ids = (c?.changed_features || []).filter((f: any) => f.feature.startsWith('requires:')).map((f: any) => f.feature.slice(9))
+    return ids.length ? [...ids, `asm-${change.to.revision_id}`, traceId] : []
+  }, [change, traceId])
   const activate = async (rid: string) => {
     if (!inv) return
-    try { const i = await api.post<Investigation>(`/api/investigations/${inv.id}/revisions/${rid}/activate`); setInv(i); setMatch(await api.get<MatchRun>(`/api/investigations/${inv.id}/match`)); say('Switched revision; later revisions are kept.') } catch (e) { fail(e) }
+    try { const i = await api.post<Investigation>(`/api/investigations/${inv.id}/revisions/${rid}/activate`); setInv(i); setChange(null); patchView({ last_change: null }); setMatch(await api.get<MatchRun>(`/api/investigations/${inv.id}/match`)); say('Switched revision; later revisions are kept.') } catch (e) { fail(e) }
   }
-  const showNode = (id: string) => { setNodeId(id); setTab('evidence'); setInspOpen(true) }
+  const [trail, setTrail] = useState<string[]>([])
+  const showNode = (id: string, fromTrail = false) => {
+    setNodeId(id); setTab('evidence'); setInspOpen(true)
+    const next = fromTrail ? trail.slice(0, trail.indexOf(id) + 1) : [...trail.filter(x => x !== id), id].slice(-10)
+    setTrail(next)
+    if (inv) patchView({ selected_node: id, evidence_trail: next, inspector_tab: 'evidence' })
+  }
   const focusFinding = (n: GNode) => { if (n.props?.variable) setSelVar(n.props.variable); if (n.props?.period) setFocus(n.props.period); setHighlight(h => !h) }
   const trace = (id: string) => { lastFocus.current = document.activeElement as HTMLElement; setTraceId(id) }
   const closeTrace = () => { setTraceId(null); window.setTimeout(() => lastFocus.current?.focus(), 0) }
@@ -171,6 +196,10 @@ export default function App() {
   const geometry = inv?.config.place.geometry || preview?.analysis_geometry || null
   const eventPoint = inv ? (inv.config.place.event_point || null) : (preview?.event_point || null)
   const imageryDate = inv?.config.view.imagery_date ?? caseOf?.event_start ?? null
+  const imageryDateB = inv?.config.view.imagery_date_b ?? null
+  const imageryMix = inv?.config.view.imagery_mix ?? 0
+  const today = new Date().toISOString().slice(0, 10)
+  const defaultDateB = (a: string | null) => { if (!a) return null; const d = new Date(a + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() - 14); return d.toISOString().slice(0, 10) }
   const hasResults = !!results?.batch
   const exportsDisabled = !inv ? 'Open an investigation first' : !hasResults ? 'Acquire NASA data first' : null
 
@@ -205,7 +234,13 @@ export default function App() {
     const x = Math.floor(((lon + 180) / 360) * n)
     const y = Math.floor(((1 - Math.log(Math.tan((lat * Math.PI) / 180) + 1 / Math.cos((lat * Math.PI) / 180)) / Math.PI) / 2) * n)
     setImgCheck('Checking…')
-    try { const r = await api.get<any>(`/api/imagery/check?date=${imageryDate}&z=${z}&x=${x}&y=${y}`); setImgCheck(r.available ? `Tile available for ${imageryDate}` : `No imagery for ${imageryDate} here (${r.reason || r.status}). Not substituted.`) } catch (e: any) { setImgCheck(e.message) }
+    const one = async (label: string, d: string) => {
+      try { const r = await api.get<any>(`/api/imagery/check?date=${d}&z=${z}&x=${x}&y=${y}`); return r.available ? `${label} ${d}: tile available` : `${label} ${d}: no imagery here (${r.reason || r.status}); not substituted` }
+      catch (e: any) { return `${label} ${d}: ${e.message}` }
+    }
+    const parts = [await one('A', imageryDate)]
+    if (imageryDateB) parts.push(await one('B', imageryDateB))
+    setImgCheck(parts.join(' · '))
   }
 
   return (
@@ -268,10 +303,25 @@ export default function App() {
               </label>
               {layers.imagery && inv && (
                 <div style={{ padding: '0 12px 6px 34px' }}>
-                  <div className="row"><input type="date" className="input" value={imageryDate || ''} min="2000-02-24" max={new Date().toISOString().slice(0, 10)} onChange={e => { setImgCheck(null); patchView({ imagery_date: e.target.value }) }} aria-label="Imagery date" /><button className="btn sm" onClick={checkImagery}>Check</button></div>
+                  <div className="row"><span className="small muted" style={{ width: 14 }}>A</span><input type="date" className="input" value={imageryDate || ''} min="2000-02-24" max={today} onChange={e => { setImgCheck(null); patchView({ imagery_date: e.target.value }) }} aria-label="Imagery date A" /></div>
+                  {imageryDateB ? (
+                    <>
+                      <div className="row" style={{ marginTop: 4 }}><span className="small muted" style={{ width: 14 }}>B</span><input type="date" className="input" value={imageryDateB} min="2000-02-24" max={today} onChange={e => { setImgCheck(null); patchView({ imagery_date_b: e.target.value }) }} aria-label="Imagery date B" /><button className="btn sm ghost" onClick={() => patchView({ imagery_date_b: null, imagery_mix: 0 })} aria-label="Remove comparison date">✕</button></div>
+                      <label className="row small muted" style={{ marginTop: 6 }}>A <input type="range" min={0} max={1} step={0.05} value={imageryMix} onChange={e => patchView({ imagery_mix: +e.target.value })} aria-label="Crossfade between date A and date B" style={{ flex: 1 }} /> B</label>
+                      <div className="row" style={{ marginTop: 4 }}>
+                        <button className="btn sm" onClick={() => patchView({ imagery_mix: imageryMix < 0.5 ? 1 : 0 })} title="Switch instantly between the two real observation dates">Flip to {imageryMix < 0.5 ? 'B' : 'A'}</button>
+                        <button className="btn sm" onClick={checkImagery}>Check both</button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="row" style={{ marginTop: 4 }}>
+                      <button className="btn sm" onClick={() => patchView({ imagery_date_b: defaultDateB(imageryDate), imagery_mix: 0 })} disabled={!imageryDate}>+ Compare a second date</button>
+                      <button className="btn sm" onClick={checkImagery}>Check</button>
+                    </div>
+                  )}
                   <label className="row small muted" style={{ marginTop: 4 }}>Opacity <input type="range" min={0.1} max={1} step={0.05} value={layers.imagery_opacity} onChange={e => setLayer('imagery_opacity', +e.target.value)} /></label>
                   {imgCheck && <p className="small muted" style={{ margin: '2px 0' }}>{imgCheck}</p>}
-                  <p className="small muted" style={{ margin: 0 }}>Imagery date is separate from the analysis period.</p>
+                  <p className="small muted" style={{ margin: 0 }}>Real daily MODIS tiles only — no interpolated frames. Imagery dates are separate from the analysis period.</p>
                 </div>
               )}
             </div>
@@ -305,7 +355,7 @@ export default function App() {
       {/* ---------------------------------------------- map */}
       <main className="mapwrap">
         <MapView geometry={geometry} support={r0?.spatial_support || null} cellCenters={r0?.cell_centers || []} eventPoint={eventPoint}
-          layers={inv ? layers : { ...DEFAULT_LAYERS, grid: false }} imageryDate={imageryDate} flyKey={flyKey} highlight={highlight}
+          layers={inv ? layers : { ...DEFAULT_LAYERS, grid: false }} imageryDate={imageryDate} imageryDateB={imageryDateB} imageryMix={imageryMix} flyKey={flyKey} highlight={highlight}
           center={inv?.config.view.center || [10, 20]} zoom={inv?.config.view.zoom || 1.6}
           onView={(c, z) => inv && patchView({ center: c, zoom: z })} />
         {health === 'down' && <div className="map-status" style={{ borderColor: 'var(--red)' }}>Backend unreachable — start the server (see README).</div>}
@@ -315,7 +365,7 @@ export default function App() {
             <p style={{ margin: '6px 0 0' }}>Open one of four source-backed case files on the left, or investigate a new place with the same NASA data and evidence pipeline.</p>
           </div>
         )}
-        {traceId && inv && <TraceView invId={inv.id} interventionId={traceId} onClose={closeTrace} onNode={id => { closeTrace(); showNode(id) }} onFocusFinding={focusFinding} />}
+        {traceId && inv && <TraceView key={traceId + inv.current_revision_id} invId={inv.id} interventionId={traceId} changed={changedNodes} onClose={closeTrace} onNode={id => { closeTrace(); showNode(id) }} onFocusFinding={focusFinding} />}
         {compare && <CompareView cases={cases} invs={invList} initialA={inv ? (inv.config.place.case_id ? `case:${inv.config.place.case_id}` : `inv:${inv.id}`) : `case:${cases[0]?.id}`} onClose={() => setCompare(false)} />}
       </main>
 
@@ -324,7 +374,8 @@ export default function App() {
         <section className="timeline" aria-label="Environmental time series">
           <Timeline results={results!.batch!.results} selected={selVar} onSelect={v => { setSelVar(v); patchView({ selected_variable: v }) }}
             events={caseOf ? [{ start: caseOf.event_start.slice(0, 7), end: caseOf.event_end.slice(0, 7), label: caseOf.event_name.split(',')[0] }] : []}
-            period={inv.config.period} bounds={meta.period_bounds} onApplyWindow={applyWindow} busy={busy === 'acquire'} focus={focus} />
+            period={inv.config.period} bounds={meta.period_bounds} onApplyWindow={applyWindow} busy={busy === 'acquire'} focus={focus}
+            findingIdFor={v => results!.batch!.finding_ids.find(f => f.endsWith('-' + v))} onInspectFinding={showNode} />
         </section>
       )}
 
@@ -346,9 +397,11 @@ export default function App() {
           )}
           {tab === 'case' && caseOf && <CasePanel c={caseOf} busy={busy === 'open'} onOpen={() => inv ? switchTab('analysis') : createFromCase(caseOf)} onNode={id => inv ? showNode(id) : say('Open the investigation to inspect graph evidence.')} />}
           {inv && meta && tab === 'analysis' && <AnalysisPanel inv={inv} results={results} busy={busy === 'acquire'} onAcquire={acquire} selectedVar={selVar} onSelectVar={v => { setSelVar(v); patchView({ selected_variable: v }) }} onNode={showNode} acqEvents={acqEvents} />}
-          {inv && meta && tab === 'leads' && <LeadsPanel inv={inv} meta={meta} match={match} busy={busy === 'match'} onRun={runMatch} onTrace={trace} onNode={showNode} onRevise={revise} hasResults={hasResults} />}
+          {inv && meta && tab === 'leads' && <LeadsPanel inv={inv} meta={meta} match={match} busy={busy === 'match'} onRun={runMatch} onTrace={trace} onNode={id => showNode(id)} onRevise={revise} hasResults={hasResults}
+            change={change} onDismissChange={() => { setChange(null); patchView({ last_change: null }) }} />}
           {inv && meta && tab === 'copilot' && <CopilotPanel invId={inv.id} meta={meta} onNode={showNode} onTab={t => switchTab(t as Tab)} />}
-          {inv && tab === 'evidence' && <EvidencePanel nodeId={nodeId} onNode={showNode} disputed={inv.state.disputed} onFocusFinding={focusFinding}
+          {inv && tab === 'evidence' && <EvidencePanel nodeId={nodeId} onNode={id => showNode(id)} disputed={inv.state.disputed} onFocusFinding={focusFinding}
+            trail={trail} onTrail={id => showNode(id, true)}
             onDispute={(id, on) => { const why = window.prompt(on ? 'Why is this claim disputed?' : 'Why remove the dispute?'); if (why) revise({ kind: on ? 'dispute' : 'undispute', node_id: id, rationale: why }) }} />}
           {inv && meta && tab === 'changes' && <ChangesPanel inv={inv} meta={meta} onRevise={revise} onActivate={activate} match={match} onNode={showNode} />}
         </div>

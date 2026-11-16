@@ -15,6 +15,8 @@ interface Props {
   eventPoint: { lon: number; lat: number; label: string } | null
   layers: Layers
   imageryDate: string | null
+  imageryDateB?: string | null
+  imageryMix?: number // 0 = show date A, 1 = show date B (real tiles only; no interpolated frames)
   flyKey: string // changes only on explicit user navigation
   highlight: boolean
   center: [number, number]
@@ -122,18 +124,25 @@ export default function MapView(p: Props) {
   useEffect(() => {
     const m = map.current
     if (!m || !ready) return
-    if (m.getLayer('gibs')) m.removeLayer('gibs')
-    if (m.getSource('gibs')) m.removeSource('gibs')
+    for (const id of ['gibsB', 'gibs']) { if (m.getLayer(id)) m.removeLayer(id); if (m.getSource(id)) m.removeSource(id) }
     setTileErr(null)
     if (p.layers.imagery && p.imageryDate) {
       m.addSource('gibs', { type: 'raster', tiles: [GIBS(p.imageryDate)], tileSize: 256, maxzoom: 9, attribution: 'Imagery: NASA EOSDIS GIBS / Worldview (MODIS Terra)' })
-      m.addLayer({ id: 'gibs', type: 'raster', source: 'gibs', paint: { 'raster-opacity': p.layers.imagery_opacity } }, 'coast')
+      m.addLayer({ id: 'gibs', type: 'raster', source: 'gibs', paint: { 'raster-opacity': p.layers.imagery_opacity, 'raster-fade-duration': 0 } }, 'coast')
+      if (p.imageryDateB) {
+        m.addSource('gibsB', { type: 'raster', tiles: [GIBS(p.imageryDateB)], tileSize: 256, maxzoom: 9 })
+        m.addLayer({ id: 'gibsB', type: 'raster', source: 'gibsB', paint: { 'raster-opacity': p.layers.imagery_opacity * (p.imageryMix ?? 0), 'raster-fade-duration': 0 } }, 'coast')
+      }
     }
-  }, [ready, p.layers.imagery, p.imageryDate])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, p.layers.imagery, p.imageryDate, p.imageryDateB])
   useEffect(() => {
     const m = map.current
-    if (m && ready && m.getLayer('gibs')) m.setPaintProperty('gibs', 'raster-opacity', p.layers.imagery_opacity)
-  }, [ready, p.layers.imagery_opacity])
+    if (!m || !ready) return
+    const mix = p.imageryDateB ? (p.imageryMix ?? 0) : 0
+    if (m.getLayer('gibs')) m.setPaintProperty('gibs', 'raster-opacity', p.layers.imagery_opacity * (1 - mix))
+    if (m.getLayer('gibsB')) m.setPaintProperty('gibsB', 'raster-opacity', p.layers.imagery_opacity * mix)
+  }, [ready, p.layers.imagery_opacity, p.imageryMix, p.imageryDateB])
 
   // fly only on explicit navigation
   useEffect(() => {
@@ -169,7 +178,9 @@ export default function MapView(p: Props) {
           {p.layers.footprint && p.geometry && <div className="li"><span className="swatch" style={{ borderColor: 'var(--amber)' }} />Requested analysis footprint</div>}
           {p.layers.grid && p.support && <div className="li"><span className="swatch" style={{ borderColor: 'var(--teal)', borderStyle: 'dashed' }} />POWER grid cells used ({p.support.cell_count} × {p.support.cell_size_deg.lat}°×{p.support.cell_size_deg.lon}°)</div>}
           {p.layers.event && (p.eventPoint || p.extraPoints?.length) && <div className="li"><span className="swatch" style={{ borderColor: 'var(--red)', borderRadius: 6 }} />Event reference point (not a hazard extent)</div>}
-          {p.layers.imagery && p.imageryDate && <div className="li"><span className="swatch" style={{ borderColor: '#9aa5ad' }} />MODIS true colour, {p.imageryDate} (visual context only)</div>}
+          {p.layers.imagery && p.imageryDate && <div className="li"><span className="swatch" style={{ borderColor: '#9aa5ad' }} /><span>MODIS true colour {p.imageryDateB
+            ? <><b style={{ color: (p.imageryMix ?? 0) < 0.5 ? 'var(--text)' : 'var(--text-3)' }}>A {p.imageryDate}</b> ↔ <b style={{ color: (p.imageryMix ?? 0) >= 0.5 ? 'var(--text)' : 'var(--text-3)' }}>B {p.imageryDateB}</b> · {Math.round((p.imageryMix ?? 0) * 100)}% B</>
+            : p.imageryDate} · visual context only</span></div>}
         </div>
       )}
     </>

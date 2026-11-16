@@ -1,0 +1,22 @@
+﻿PASS investigation open with NASA series in timeline
+PASS date B defaulted to 14 days before A: 2018-10-25
+PASS availability checked for both dates
+      ['A 2018-11-08: tile available · B 2018-10-25: tile available']
+PASS flip shows date B (legend 100% B)
+PASS timeline click pins a month with value/anomaly/trend readout
+      2018-08pinned | T2M 24.25 C | anomaly −0.16 vs 2001–2020 mean · fitted trend +0.37 | NASA POWER monthly, area-weighted (16 cells) · artifact art-3abb9b0100b1-v1 | Inspect finding | Unpin
+PASS Inspect finding opens the computed finding's evidence sheet
+PASS evidence trail breadcrumbs appear after drilling into provenance
+PASS Back returns to the finding
+PASS assessment-updated banner appears after the revision
+      ASSESSMENT UPDATED | ✕ |  | R1 set requirement — “Scenario: Paradise-like community adjacent to wildland fuels (planning assumption).” |  | Top lead: Collaborative evacuation planning with realistic, repeated training exercises (NIST R-EP 1 to R-EP 4) → Resilient, multi-modal emergency notification 
+PASS banner shows before → after states from what-changed
+PASS trace marks changed nodes (3)
+PASS new assumption node appears in trace with assumption styling
+PASS reload restores comparison date B
+PASS reload restores A/B mix
+PASS reload restores the last assessment change
+PASS revision R1 persisted after reload
+PASS reload restores the selected evidence sheet
+PASS no page errors ([])
+18/18 passed

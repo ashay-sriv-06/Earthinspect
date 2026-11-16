@@ -256,3 +256,16 @@ details.events > summary { list-style: none; }
 .react-flow__node { font-family: var(--font); }
 
 .react-flow__node[data-id^="hdr-"] .react-flow__handle { display: none; }
+
+.tl-readout { position: absolute; right: 12px; top: 46px; background: rgba(17,24,32,.95); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 6px 10px; font-size: 11.5px; color: var(--text-2); max-width: 340px; z-index: 5; pointer-events: auto; }
+.timeline { position: relative; }
+
+.crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-bottom: 8px; font-size: 11px; }
+.cite.cur { border-color: var(--teal); background: var(--teal-dim); color: var(--text); }
+
+.inline-rev { display: grid; gap: 4px; margin-top: 6px; padding: 6px; border: 1px dashed var(--amber-ink); border-radius: 6px; background: #fbf6ea; }
+.input.pap { background: #fff; color: var(--paper-text); border-color: var(--paper-line); height: 28px; }
+.change-banner { border: 1.5px solid var(--teal-ink); box-shadow: 0 0 0 3px var(--teal-dim); animation: fadein var(--t-panel) ease; }
+.tn.chg { box-shadow: 0 0 0 3px var(--amber); }
+
+.mapwrap > .map-legend { bottom: 40px; }

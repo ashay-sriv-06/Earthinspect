@@ -26,3 +26,27 @@ Start: 2026-11-15 18:35 PST. User deadline: 23:15 PST (5 h). Budget scaled from 
 - Configure `ANTHROPIC_API_KEY` to exercise the LLM copilot end to end.
 - Choose a host with a persistent volume (e.g. a container platform), build the Dockerfile, and verify from a fresh session.
 - Optional: more numerical adapters (GPM IMERG), more case files, and an independent review of the requirement mappings.
+
+
+## Sprint 2 — interactivity (60 min)
+Start 2026-11-15 22:09 PST · **Deadline 23:09 PST** · verification from 23:01.
+Target flow: open investigation → compare real observation dates → inspect a finding → investigate supporting evidence → revise a relevant assumption → see graph + assessment update → reopen saved result.
+Phases (derived from the target flow; the pasted brief did not list them):
+1. Compare real observation dates (two GIBS dates, availability-checked, crossfade/flicker)
+2. Inspect a finding (timeline hover readout + click-to-inspect month, finding focus)
+3. Investigate supporting evidence (navigable provenance with back history)
+4. Revise a relevant assumption inline from a lead's unknown prerequisite
+5. See graph + assessment update (automatic before→after diff, trace refresh with changed nodes marked)
+6. Reopen saved result (persist compare dates, selected evidence, last change; restore on reload)
+
+
+### Sprint 2 results (verified 22:16, real app, headless Chromium — scripts/flow_check.py → 18/18; docs/flow_check_output.txt)
+| phase | status | what actually works |
+|---|---|---|
+| 1 Compare dates | ✅ | Second GIBS date (defaults to A−14 d), A↔B crossfade slider + Flip, availability check for both dates (Camp Fire: 2018-11-08 plume vs 2018-10-25 clear). Real tiles only. |
+| 2 Inspect a finding | ✅ | Timeline hover readout; click pins a month: value, monthly total (precip), anomaly vs baseline, fitted trend, missing-month and event-window flags, artifact id; Inspect finding → evidence sheet. |
+| 3 Supporting evidence | ✅ | Breadcrumb trail + Back across provenance hops; Used-by list from persisted incoming edges. |
+| 4 Revise assumption | ✅ | Inline on each prerequisite row: Assume satisfied / not satisfied / Link source / Clear, rationale required; labelled as planning assumption or linked source. |
+| 5 Graph + assessment update | ✅ | Automatic what-changed banner (eligibility, match, coverage, feature states, top lead); Trace marks changed nodes and shows the new Assumption node. Example: assuming WUI exposure moved top lead evacuation planning → multichannel notification (needs local evidence → candidate lead). |
+| 6 Reopen saved result | ✅ | Reload restores imagery A/B + mix, inspector tab, evidence trail/selected node, last change banner, revisions. |
+Regression: pytest 20/20, e2e 31/31. Finished 22:17, ~52 min before deadline. No backend schema changes; view state uses the existing investigation view config.

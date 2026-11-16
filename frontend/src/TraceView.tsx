@@ -9,7 +9,7 @@ interface Trace { intervention_id: string; investigation_id: string; evaluation:
 
 const LAYER_TITLES = ['Sources & datasets', 'Artifacts & events', 'Analyses', 'Findings & assumptions', 'Mechanism & requirements', 'Response', 'Target investigation']
 
-export default function TraceView({ invId, interventionId, onClose, onNode, onFocusFinding }: { invId: string; interventionId: string; onClose: () => void; onNode: (id: string) => void; onFocusFinding: (n: GNode) => void }) {
+export default function TraceView({ invId, interventionId, onClose, onNode, onFocusFinding, changed = [] }: { invId: string; interventionId: string; onClose: () => void; onNode: (id: string) => void; onFocusFinding: (n: GNode) => void; changed?: string[] }) {
   const [t, setT] = useState<Trace | null>(null)
   const [err, setErr] = useState<string | null>(null)
   const [sel, setSel] = useState<string | null>(null)
@@ -40,7 +40,7 @@ export default function TraceView({ invId, interventionId, onClose, onNode, onFo
       const a = n.assessment?.state
       nodes.push({
         id: n.id, position: { x: i * COLW - ((ns.length - 1) * COLW) / 2 - 95, y: r * ROWH }, draggable: false,
-        data: { label: <div className={`tn ${n.type} s-${n.status} ${a ? 'a-' + a : ''} ${sel === n.id ? 'sel' : ''}`}><div className="ty"><span>{n.type}</span><span>{a ? (a === 'compatible' ? '✓' : a === 'unknown' ? '?' : '✕') + ' ' + a : n.status === 'hypothesis' ? 'hyp' : ''}</span></div><div className="lb">{n.label}</div></div> },
+        data: { label: <div className={`tn ${n.type} s-${n.status} ${a ? 'a-' + a : ''} ${sel === n.id ? 'sel' : ''} ${changed.includes(n.id) ? 'chg' : ''}`}><div className="ty"><span>{changed.includes(n.id) ? '● changed · ' : ''}{n.type}</span><span>{a ? (a === 'compatible' ? '✓' : a === 'unknown' ? '?' : '✕') + ' ' + a : n.status === 'hypothesis' ? 'hyp' : ''}</span></div><div className="lb">{n.label}</div></div> },
         style: { padding: 0, border: 0, background: 'transparent', width: 190 },
         sourcePosition: 'bottom' as any, targetPosition: 'top' as any,
       })
@@ -59,7 +59,8 @@ export default function TraceView({ invId, interventionId, onClose, onNode, onFo
       }
     })
     return { nodes, edges }
-  }, [t, sel, pulse])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [t, sel, pulse, changed.join('|')])
 
   const selNode = t?.nodes.find(n => n.id === sel)
   const pick = (id: string) => { setSel(id); const n = t?.nodes.find(x => x.id === id); if (n?.type === 'Finding' && n.props.kind?.startsWith('trend')) onFocusFinding(n) }

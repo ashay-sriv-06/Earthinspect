@@ -12,6 +12,8 @@ interface Props {
   onApplyWindow: (start: string, end: string) => void
   busy: boolean
   focus: { start: string; end: string } | null
+  findingIdFor?: (variable: string) => string | undefined
+  onInspectFinding?: (id: string) => void
 }
 
 const mi = (d: string) => +d.slice(0, 4) * 12 + (+d.slice(5, 7) - 1)
@@ -23,6 +25,8 @@ export default function Timeline(p: Props) {
   const [mode, setMode] = useState<'anomaly' | 'value'>('anomaly')
   const [brush, setBrush] = useState<[number, number] | null>(null)
   const drag = useRef<number | null>(null)
+  const [hover, setHover] = useState<number | null>(null)
+  const [pin, setPin] = useState<number | null>(null)
   const H = 140, padL = 44, padR = 12, padT = 10, padB = 20
 
   useEffect(() => {
@@ -75,12 +79,21 @@ export default function Timeline(p: Props) {
     e.currentTarget.setPointerCapture(e.pointerId)
   }
   const move = (e: React.PointerEvent<SVGSVGElement>) => {
-    if (drag.current === null) return
     const x = e.clientX - e.currentTarget.getBoundingClientRect().left
     const v = Math.max(a0, Math.min(a1, inv(x)))
+    setHover(x >= padL ? v : null)
+    if (drag.current === null) return
     setBrush([Math.min(drag.current, v), Math.max(drag.current, v)])
   }
-  const up = () => { drag.current = null; if (brush && brush[1] - brush[0] < 2) setBrush(null) }
+  const up = () => {
+    if (brush && brush[1] - brush[0] < 2) { setPin(brush[0]); setBrush(null) } // a click (not a drag) pins that month
+    drag.current = null
+  }
+  const shown = pin ?? hover
+  const row = shown !== null ? r.series.find(s => mi(s.date) === shown) : null
+  const tlv = shown !== null && r.trend_line ? r.trend_line.find(t => mi(t.date) === shown) : null
+  const inEvent = shown !== null ? p.events.find(e => shown >= mi(e.start) && shown <= mi(e.end)) : null
+  const fid = p.findingIdFor?.(r.variable)
   const bMonths = brush ? brush[1] - brush[0] + 1 : 0
 
   return (
@@ -109,7 +122,7 @@ export default function Timeline(p: Props) {
           <button className="btn sm" disabled={p.busy} onClick={() => p.onApplyWindow(p.bounds.start, p.bounds.end)} title="Return to the full 2001–2024 window">Reset to {p.bounds.start.slice(0, 4)}–{p.bounds.end.slice(0, 4)}</button>
         )}
       </div>
-      <svg className="tl-svg" height={H} width={w} onPointerDown={down} onPointerMove={move} onPointerUp={up} role="img"
+      <svg className="tl-svg" height={H} width={w} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerLeave={() => setHover(null)} role="img"
         aria-label={`${r.variable} monthly series ${p.period.start} to ${p.period.end}. Drag to preview a window, then Apply.`} style={{ cursor: 'crosshair', touchAction: 'none' }}>
         {p.events.map(e => {
           const s = Math.max(a0, mi(e.start)), en = Math.min(a1, mi(e.end))
@@ -125,7 +138,27 @@ export default function Timeline(p: Props) {
         <path d={path} fill="none" stroke="#8c9ba6" strokeWidth={1} />
         {tl && <path d={tl} stroke="var(--teal)" strokeWidth={2.2} />}
         {brush && <rect x={X(brush[0])} y={padT} width={Math.max(1, X(brush[1]) - X(brush[0]))} height={H - padT - padB} fill="var(--teal-dim)" stroke="var(--teal)" />}
+        {shown !== null && <line x1={X(shown)} x2={X(shown)} y1={padT} y2={H - padB} stroke={pin !== null ? 'var(--amber)' : 'var(--text-3)'} strokeDasharray={pin !== null ? undefined : '2 2'} />}
+        {row && (mode === 'anomaly' ? row.anomaly : row.value) !== null && <circle cx={X(shown!)} cy={Y((mode === 'anomaly' ? row.anomaly : row.value) as number)} r={3.5} fill="var(--amber)" />}
       </svg>
+      {row && (
+        <div className="tl-readout" role="status" aria-live="polite"
+          style={{ pointerEvents: pin !== null ? 'auto' : 'none', ...(X(shown!) > w / 2 ? { left: padL + 8, right: 'auto' } : { right: 12, left: 'auto' }) }}>
+          <b className="num">{row.date}</b>{pin !== null && <span className="badge b-neutral" style={{ marginLeft: 6 }}>pinned</span>}
+          {row.value === null
+            ? <div style={{ color: 'var(--amber)' }}>Missing month — kept on the calendar, not filled</div>
+            : <div className="num">
+                {r.variable} {row.value.toFixed(2)} {r.units}{row.monthly_total_mm != null && <> · {row.monthly_total_mm.toFixed(1)} mm month total</>}
+                <br />anomaly {fmt(row.anomaly, 2)} vs {r.baseline.start.slice(0, 4)}–{r.baseline.end.slice(0, 4)} mean{tlv && <> · fitted trend {fmt(tlv.value, 2)}</>}
+              </div>}
+          {inEvent && <div style={{ color: 'var(--red)' }}>Within documented event interval: {inEvent.label}</div>}
+          <div className="muted">NASA POWER monthly, area-weighted ({r.spatial_support.cell_count} cells) · artifact {r.artifact_id}</div>
+          <div className="row" style={{ marginTop: 4 }}>
+            {fid && p.onInspectFinding && <button className="btn sm" onClick={() => p.onInspectFinding!(fid)}>Inspect finding</button>}
+            {pin !== null && <button className="btn sm ghost" onClick={() => setPin(null)}>Unpin</button>}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

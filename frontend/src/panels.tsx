@@ -204,7 +204,33 @@ function AssocCard({ a }: { a: any }) {
 }
 
 /* ------------------------------------------------------------ leads */
-export function LeadsPanel(p: { inv: Investigation; meta: Meta; match: MatchRun | null; busy: boolean; onRun: () => void; onTrace: (id: string) => void; onNode: (id: string) => void; onRevise: (body: any) => Promise<void>; hasResults: boolean }) {
+function ChangeBanner({ d, onTrace, onDismiss }: { d: any; onTrace: (id: string) => void; onDismiss?: () => void }) {
+  const changed = d.candidates.filter((c: any) => c.changed)
+  const title = (id: string | null) => (id && d.candidates.find((c: any) => c.intervention_id === id)?.title) || id || '—'
+  return (
+    <div className="sheet change-banner" role="status" aria-live="polite">
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <h4 style={{ margin: 0 }}>Assessment updated</h4>
+        {onDismiss && <button className="btn sm ghost" onClick={onDismiss} aria-label="Dismiss">✕</button>}
+      </div>
+      <p className="small" style={{ margin: '4px 0' }}>{d.responsible_revisions.map((r: any) => `R${r.seq} ${humanize(r.kind)} — “${r.rationale}”`).join('; ')}</p>
+      <p className="small" style={{ margin: '4px 0' }}><b>Top lead:</b> {d.top_lead.changed ? <>{title(d.top_lead.from)} → <b>{title(d.top_lead.to)}</b></> : 'unchanged'}</p>
+      {changed.length === 0 && <p className="small muted">No eligibility or feature changed. {d.unchanged_note}</p>}
+      {changed.map((c: any) => (
+        <div key={c.intervention_id} className="small" style={{ borderTop: '1px solid var(--paper-line)', padding: '4px 0' }}>
+          <b>{c.title}</b> <span className="muted">({c.source_place})</span><br />
+          <span className={`lead-tag ${c.eligibility.from}`}>{humanize(c.eligibility.from)}</span> → <span className={`lead-tag ${c.eligibility.to}`}>{humanize(c.eligibility.to)}</span>
+          <span className="num"> · match {c.match_score.from?.toFixed(2)}→{c.match_score.to?.toFixed(2)} · coverage {c.coverage.from?.toFixed(2)}→{c.coverage.to?.toFixed(2)}</span>
+          {c.changed_features.map((f: any) => <div key={f.feature} className="muted">{f.feature.replace('requires:', '')}: {f.from} → <span className={`st ${f.to}`}>{f.to}</span></div>)}
+          <button className="btn sm" style={{ marginTop: 4 }} onClick={() => onTrace(c.intervention_id)}>Trace updated lead</button>
+        </div>
+      ))}
+      <p className="small muted" style={{ margin: '4px 0 0' }}>{d.artifacts_reused} Match runs {d.from.match_run} → {d.to.match_run}.</p>
+    </div>
+  )
+}
+
+export function LeadsPanel(p: { inv: Investigation; meta: Meta; match: MatchRun | null; busy: boolean; onRun: () => void; onTrace: (id: string) => void; onNode: (id: string) => void; onRevise: (body: any) => Promise<void>; hasResults: boolean; change?: any; onDismissChange?: () => void }) {
   const [mech, setMech] = useState(p.inv.state.mechanism || '')
   const [scale, setScale] = useState(p.inv.state.scale || '')
   useEffect(() => { setMech(p.inv.state.mechanism || ''); setScale(p.inv.state.scale || '') }, [p.inv.state.mechanism, p.inv.state.scale])
@@ -240,7 +266,8 @@ export function LeadsPanel(p: { inv: Investigation; meta: Meta; match: MatchRun 
       </div>
       {!p.hasResults && <p className="small muted">Tip: acquire NASA data first so environmental context features can be assessed (otherwise they stay unknown).</p>}
       {m && m.insufficient_context && <div className="empty" style={{ marginBottom: 10 }}><h3>Context insufficient</h3><p>The target's hazard mechanism is not established, so no precedent can be judged transferable. Establish it above; every candidate stays “needs local evidence” until then.</p></div>}
-      {m && m.leads.map((e, i) => <LeadCard key={e.intervention_id} e={e} rank={i + 1} onTrace={p.onTrace} onNode={p.onNode} />)}
+      {p.change && <ChangeBanner d={p.change} onTrace={p.onTrace} onDismiss={p.onDismissChange} />}
+      {m && m.leads.map((e, i) => <LeadCard key={e.intervention_id} e={e} rank={i + 1} onTrace={p.onTrace} onNode={p.onNode} onRevise={p.onRevise} />)}
       {m && m.leads.length === 0 && <div className="empty"><h3>No eligible precedent</h3><p>No documented response passed the contextual rules. See exclusions below for what does not transfer.</p></div>}
       {m && m.other_candidates.length > 0 && (
         <>
@@ -277,7 +304,42 @@ export function LeadsPanel(p: { inv: Investigation; meta: Meta; match: MatchRun 
   )
 }
 
-function LeadCard({ e, rank, onTrace, onNode }: { e: Evaluation; rank: number; onTrace: (id: string) => void; onNode: (id: string) => void }) {
+function ReqActions({ reqId, state, onRevise }: { reqId: string; state: string; onRevise: (b: any) => Promise<void> }) {
+  const [mode, setMode] = useState<null | 'satisfied' | 'unsatisfied' | 'unknown' | 'source'>(null)
+  const [why, setWhy] = useState('')
+  const [src, setSrc] = useState('')
+  const [loc, setLoc] = useState('')
+  const [sources, setSources] = useState<GNode[]>([])
+  const [busy, setBusy] = useState(false)
+  useEffect(() => { if (mode === 'source' && !sources.length) api.get<GNode[]>('/api/graph/sources').then(setSources).catch(() => {}) }, [mode, sources.length])
+  if (!mode) return (
+    <span className="row wrap" style={{ marginTop: 4, gap: 4 }}>
+      {state !== 'compatible' && <button className="btn sm" onClick={() => setMode('satisfied')} title="Record a labelled planning assumption (not a sourced fact)">Assume satisfied</button>}
+      {state !== 'incompatible' && <button className="btn sm" onClick={() => setMode('unsatisfied')}>Assume not satisfied</button>}
+      <button className="btn sm" onClick={() => setMode('source')} title="Attach an already-ingested source record">Link source…</button>
+      {state !== 'unknown' && <button className="btn sm ghost" onClick={() => setMode('unknown')}>Clear</button>}
+    </span>
+  )
+  const submit = async () => {
+    setBusy(true)
+    try {
+      await onRevise(mode === 'source'
+        ? { kind: 'set_requirement', requirement_id: reqId, state: 'satisfied', basis: 'source_reported', source_id: src, locator: loc, rationale: why }
+        : { kind: 'set_requirement', requirement_id: reqId, state: mode, basis: 'analyst_assumption', rationale: why })
+      setMode(null); setWhy('')
+    } finally { setBusy(false) }
+  }
+  return (
+    <span className="inline-rev">
+      <b className="small">{mode === 'source' ? 'Link a source: prerequisite satisfied' : mode === 'unknown' ? 'Clear back to unknown' : `Planning assumption: ${mode === 'satisfied' ? 'satisfied' : 'not satisfied'}`}</b>
+      {mode === 'source' && <span className="grid2"><select className="input pap" value={src} onChange={x => setSrc(x.target.value)} aria-label="Ingested source"><option value="">Choose source…</option>{sources.map(s => <option key={s.id} value={s.id}>{s.label.slice(0, 50)}</option>)}</select><input className="input pap" placeholder="page / section" value={loc} onChange={x => setLoc(x.target.value)} aria-label="Locator" /></span>}
+      <input className="input pap" placeholder="Rationale (required, stored with the revision)" value={why} onChange={x => setWhy(x.target.value)} aria-label="Rationale" onKeyDown={x => x.key === 'Enter' && why.trim() && !(mode === 'source' && !src) && submit()} />
+      <span className="row" style={{ gap: 4 }}><button className="btn sm primary" disabled={busy || !why.trim() || (mode === 'source' && !src)} onClick={submit}>{busy ? 'Saving…' : 'Save revision'}</button><button className="btn sm ghost" onClick={() => setMode(null)}>Cancel</button></span>
+    </span>
+  )
+}
+
+function LeadCard({ e, rank, onTrace, onNode, onRevise }: { e: Evaluation; rank: number; onTrace: (id: string) => void; onNode: (id: string) => void; onRevise?: (b: any) => Promise<void> }) {
   const label: Record<string, string> = { candidate_lead: 'Candidate lead', partial_component_only: 'Partial — component only', needs_local_evidence: 'Needs local evidence' }
   return (
     <div className="sheet">
@@ -290,7 +352,8 @@ function LeadCard({ e, rank, onTrace, onNode }: { e: Evaluation; rank: number; o
         <div title="Share of feature weight whose state is known">Coverage <b className="num">{e.coverage.toFixed(2)}</b><div className="meter cov"><i style={{ width: `${e.coverage * 100}%` }} /></div></div>
       </div>
       {e.features.map(f => (
-        <div className="feat" key={f.feature}><span className={`st ${f.state}`}>{f.state === 'compatible' ? '✓ ' : f.state === 'unknown' ? '? ' : '✕ '}{f.state}</span><span>{f.detail}</span></div>
+        <div className="feat" key={f.feature}><span className={`st ${f.state}`}>{f.state === 'compatible' ? '✓ ' : f.state === 'unknown' ? '? ' : '✕ '}{f.state}{f.kind === 'decisive' && <><br /><span className="muted" style={{ fontWeight: 400, textTransform: 'none' }}>decisive</span></>}</span>
+          <span>{f.detail}{f.feature.startsWith('requires:') && onRevise && <ReqActions reqId={f.feature.slice(9)} state={f.state} onRevise={onRevise} />}</span></div>
       ))}
       {e.conflicts.length > 0 && <><h4>Documented limitations</h4>{e.conflicts.map(c => <p key={c.id} className="small"><span className="badge b-conflict">Limitation</span> {c.label}</p>)}</>}
       {e.next_evidence.length > 0 && <><h4>Next evidence needed</h4><ul className="small" style={{ paddingLeft: 18, margin: 0 }}>{e.next_evidence.map(n => <li key={n}>{n}</li>)}</ul></>}
@@ -303,9 +366,20 @@ function LeadCard({ e, rank, onTrace, onNode }: { e: Evaluation; rank: number; o
 }
 
 /* ------------------------------------------------------------ evidence sheet (any node) */
-export function EvidencePanel({ nodeId, onNode, onDispute, disputed, onFocusFinding }: { nodeId: string | null; onNode: (id: string) => void; onDispute: (id: string, on: boolean) => void; disputed: string[]; onFocusFinding: (n: GNode) => void }) {
+export function EvidencePanel({ nodeId, onNode, onDispute, disputed, onFocusFinding, trail = [], onTrail }: { nodeId: string | null; onNode: (id: string) => void; onDispute: (id: string, on: boolean) => void; disputed: string[]; onFocusFinding: (n: GNode) => void; trail?: string[]; onTrail?: (id: string) => void }) {
   const [n, setN] = useState<GNode | null>(null)
   const [prov, setProv] = useState<{ nodes: GNode[]; edges: any[] } | null>(null)
+  const [usedBy, setUsedBy] = useState<{ nodes: GNode[]; edges: any[] } | null>(null)
+  useEffect(() => {
+    if (!nodeId) return
+    api.get<any>(`/api/graph/neighborhood/${encodeURIComponent(nodeId)}`).then(setUsedBy).catch(() => setUsedBy(null))
+  }, [nodeId])
+  const crumbs = trail.length > 1 && onTrail ? (
+    <nav className="crumbs" aria-label="Evidence trail">
+      <button className="btn sm" disabled={trail.length < 2} onClick={() => onTrail(trail[trail.length - 2])}>← Back</button>
+      {trail.map((t, i) => <span key={t}>{i > 0 && <span className="muted"> › </span>}<button className={`cite ${t === nodeId ? 'cur' : ''}`} onClick={() => onTrail(t)} title={t}>{t.length > 18 ? t.slice(0, 18) + '…' : t}</button></span>)}
+    </nav>
+  ) : null
   const [bundle, setBundle] = useState<Bundle | null>(null)
   const [err, setErr] = useState<string | null>(null)
   useEffect(() => {
@@ -320,8 +394,10 @@ export function EvidencePanel({ nodeId, onNode, onDispute, disputed, onFocusFind
   if (!n) return <div className="row"><span className="spinner" /> Loading…</div>
   const p = n.props
   const isDisputed = disputed.includes(n.id)
+  const incoming = (usedBy?.edges || []).filter(e => e.dst === n.id && e.src !== n.id)
   return (
     <div>
+      {crumbs}
       <div className="sheet">
         <div className="row" style={{ justifyContent: 'space-between' }}><span className="muted small">{n.type} · <code>{n.id}</code></span><StatusBadge status={isDisputed ? 'disputed' : n.status} /></div>
         <h3 style={{ marginTop: 4 }}>{n.label}</h3>
@@ -353,6 +429,15 @@ export function EvidencePanel({ nodeId, onNode, onDispute, disputed, onFocusFind
           {prov.edges.map(e => {
             const dst = prov.nodes.find(x => x.id === e.dst)
             return <p key={e.id} className="small"><code>{e.src.slice(0, 26)}</code> <b>{e.type}</b> → <button className="cite" onClick={() => onNode(e.dst)}>{dst?.type || ''}</button> {dst?.label.slice(0, 80)}</p>
+          })}
+        </div>
+      )}
+      {incoming.length > 0 && (
+        <div className="sheet">
+          <h4 style={{ marginTop: 0 }}>Used by (incoming persisted edges)</h4>
+          {incoming.slice(0, 12).map(e => {
+            const src = usedBy!.nodes.find(x => x.id === e.src)
+            return <p key={e.id} className="small"><button className="cite" onClick={() => onNode(e.src)}>{src?.type || 'node'}</button> {src?.label.slice(0, 70)} <b>{e.type}</b> → this{e.status === 'hypothesis' && <span className="badge b-hyp" style={{ marginLeft: 4 }}>hypothesis</span>}</p>
           })}
         </div>
       )}
